@@ -13,7 +13,7 @@ import "forge-std/console.sol";
 
 contract TokenLaunchpadTest is Test {
   IERC20 _weth;
-  MockERC20 _maha;
+  MockERC20 _something;
   MockERC20 _stakingToken;
 
   TokenLaunchpad _launchpad;
@@ -25,13 +25,13 @@ contract TokenLaunchpadTest is Test {
 
   function _setUpBase() internal {
     _weth = IERC20(0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c);
-    _maha = new MockERC20("Maha", "MAHA", 18);
+    _something = new MockERC20("Something", "somETHing", 18);
     _stakingToken = new MockERC20("Staking Token", "STK", 18);
 
     // _launchpad = new TokenLaunchpad();
 
     vm.label(address(_weth), "weth");
-    vm.label(address(_maha), "maha");
+    vm.label(address(_something), "something");
     vm.deal(owner, 1000 ether);
     vm.deal(whale, 1000 ether);
     vm.deal(creator, 1000 ether);

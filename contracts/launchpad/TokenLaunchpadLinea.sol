@@ -28,20 +28,16 @@ contract TokenLaunchpadLinea is TokenLaunchpad {
     internal
     override
   {
-    address nileTreasury = 0xF0FfFD0292dE675e865A9b506bd2c434e0813d74;
+    address etherxTreasury = 0xF0FfFD0292dE675e865A9b506bd2c434e0813d74;
     address somethingTreasury = 0x5135f3A6aC33C8616b5ee59b89afc1021D1a8086;
-    address efrogsTreasury = 0x4c11F940E2D09eF9D5000668c1C9410f0AaF0833;
 
-    // 20% to the nile treasury
-    // 40% to the maha treasury
-    // 40% to the efrogs treasury
+    // 20% to the etherx treasury
+    // 40% to the something treasury
 
-    IERC20(_token0).transfer(nileTreasury, _amount0 * 20 / 100);
-    IERC20(_token0).transfer(somethingTreasury, _amount0 * 40 / 100);
-    IERC20(_token0).transfer(efrogsTreasury, _amount0 * 40 / 100);
+    IERC20(_token0).transfer(etherxTreasury, _amount0 * 20 / 100);
+    IERC20(_token0).transfer(somethingTreasury, _amount0 * 80 / 100);
 
-    IERC20(_token1).transfer(nileTreasury, _amount1 * 20 / 100);
-    IERC20(_token1).transfer(somethingTreasury, _amount1 * 40 / 100);
-    IERC20(_token1).transfer(efrogsTreasury, _amount1 * 40 / 100);
+    IERC20(_token1).transfer(etherxTreasury, _amount1 * 20 / 100);
+    IERC20(_token1).transfer(somethingTreasury, _amount1 * 90 / 100);
   }
 }

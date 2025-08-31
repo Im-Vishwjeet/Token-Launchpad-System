@@ -1,6 +1,9 @@
 import { HardhatRuntimeEnvironment } from "hardhat/types";
-import { RamsesAdapter } from "../types";
-import { deployAdapter, deployTokenSimple, templateLaunchpad } from "./mainnet-template";
+import {
+  deployAdapter,
+  deployTokenSimple,
+  templateLaunchpad,
+} from "./mainnet-template";
 import { deployContract, waitForTx } from "../scripts/utils";
 
 async function main(hre: HardhatRuntimeEnvironment) {
@@ -14,15 +17,15 @@ async function main(hre: HardhatRuntimeEnvironment) {
   // Deploy SOMETHING contract
   const something = await deployContract(
     hre,
-    "SOMETHING",
-    ["SOMETHING Token", "SOMETHING"],
-    "SOMETHING",
+    "SomeToken",
+    [],
+    "somETHing",
     deployer
   );
 
   console.log("SOMETHING contract deployed at:", something.address);
 
-  const {launchpad, swapper } = await templateLaunchpad(
+  const { launchpad, swapper } = await templateLaunchpad(
     hre,
     deployer,
     proxyAdmin,
@@ -31,18 +34,14 @@ async function main(hre: HardhatRuntimeEnvironment) {
     odosAddressOnLinea
   );
 
-  const adapterNile = await deployAdapter(
-    hre,
-    "RamsesAdapter",
-    {
-      launchpad,
-      wethAddress: wethAddressOnLinea,
-      nftPositionManager,
-      swapRouter: "0xAAAE99091Fbb28D400029052821653C1C752483B",
-      locker: "0x0000BF531058EE5eC27417F96eBb1D7Bb8ccF4db",
-      clPoolFactory: "0xAAA32926fcE6bE95ea2c51cB4Fcb60836D320C42"
-    }
-  );
+  const adapterNile = await deployAdapter(hre, "RamsesAdapter", {
+    launchpad,
+    wethAddress: wethAddressOnLinea,
+    nftPositionManager,
+    swapRouter: "0xAAAE99091Fbb28D400029052821653C1C752483B",
+    locker: "0x0000BF531058EE5eC27417F96eBb1D7Bb8ccF4db",
+    clPoolFactory: "0xAAA32926fcE6bE95ea2c51cB4Fcb60836D320C42",
+  });
 
   // Set default value parameters
   await waitForTx(
@@ -55,7 +54,7 @@ async function main(hre: HardhatRuntimeEnvironment) {
         graduationTick: -160500,
         launchTick: -186600,
         tickSpacing: 60,
-        upperMaxTick: 885000
+        upperMaxTick: 885000,
       }
     )
   );
@@ -96,8 +95,8 @@ async function main(hre: HardhatRuntimeEnvironment) {
     // const mahaD = await deployContract(
     //   hre,
     //   "MockERC20",
-    //   ["TEST MAHA", "TMAHA", 18],
-    //   "MAHA"
+    //   ["TEST somETHing", "TsomETHing", 18],
+    //   "somETHing"
     // );
 
     // const maha = await hre.ethers.getContractAt("MockERC20", mahaD.address);

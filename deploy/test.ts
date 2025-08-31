@@ -11,8 +11,8 @@ async function main(hre: HardhatRuntimeEnvironment) {
   const mahaD = await deployContract(
     hre,
     "MockERC20",
-    ["TEST MAHA", "TMAHA", 18],
-    "MAHA"
+    ["TEST somETHing", "TsomETHing", 18],
+    "somETHing"
   );
 
   const tokenD = await deployContract(hre, "AgentToken", [], "AgentTokenImpl");
@@ -76,7 +76,7 @@ async function main(hre: HardhatRuntimeEnvironment) {
       name: "test", // string name;
       symbol: "test", // string symbol;
       limitPerWallet: 10000000000n * e18, // uint256 limitPerWallet;
-      goal: 10000n * e18, // uint256 goal; - 10,000 MAHA
+      goal: 10000n * e18, // uint256 goal; - 10,000 somETHing
       tokensToSell: 10000000000n * e18, // uint256 tokensToSell;
       metadata: "{}", // string metadata;
       bondingCurve: curve.address, // address bondingCurve;
