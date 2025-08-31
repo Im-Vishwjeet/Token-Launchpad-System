@@ -93,8 +93,9 @@ interface ITokenLaunchpad {
 
   /// @notice Initializes the launchpad contract
   /// @param _owner The owner address
-  /// @param _weth The WETH9 contract address
-  function initialize(address _owner, address _weth) external;
+  /// @param _fundingToken The funding token address
+  /// @param _adapter The adapter address
+  function initialize(address _owner, address _fundingToken, address _adapter) external;
 
   /// @notice Gets the funding token
   /// @return fundingToken The funding token
@@ -111,10 +112,6 @@ interface ITokenLaunchpad {
     external
     payable
     returns (address token, uint256 received, uint256 swapped);
-
-  /// @notice Gets the pool fee
-  /// @return poolFee The pool fee
-  function POOL_FEE() external view returns (uint16 poolFee);
 
   /// @notice Gets the adapter
   /// @return adapter The adapter
@@ -133,14 +130,4 @@ interface ITokenLaunchpad {
   /// @return claimedFees0 The claimed fees for the token
   /// @return claimedFees1 The claimed fees for the token
   function claimedFees(IERC20 _token) external view returns (uint256 claimedFees0, uint256 claimedFees1);
-
-  /// @notice Gets the claimed fees by creator for a token
-  /// @param _creator The creator to get the claimed fees for
-  /// @param _token The token to get the claimed fees for
-  /// @return claimedFees0 The claimed fees for the token
-  /// @return claimedFees1 The claimed fees for the token
-  function claimedFeesByCreator(address _creator, IERC20 _token)
-    external
-    view
-    returns (uint256 claimedFees0, uint256 claimedFees1);
 }

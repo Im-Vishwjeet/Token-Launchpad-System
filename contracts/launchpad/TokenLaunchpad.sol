@@ -46,17 +46,15 @@ abstract contract TokenLaunchpad is ITokenLaunchpad, OwnableUpgradeable, ERC721E
 
   mapping(IERC20 => mapping(ICLMMAdapter => ValueParams)) public defaultValueParams;
 
-  int24 public launchTick;
-  int24 public graduationTick;
-  int24 public upperMaxTick;
-  int24 public tickSpacing;
-  uint256 public graduationLiquidity;
+  int24 public immutable launchTick = -206_200;
+  int24 public immutable graduationTick = -180_000;
+  int24 public immutable upperMaxTick = 886_000;
+  uint256 public immutable graduationLiquidity = 600_000_000 * 1e18; // 60%
 
   // Maximum allowed creator allocation percentage (5%)
   uint16 public immutable MAX_CREATOR_ALLOCATION = 500;
 
-  uint16 public constant POOL_FEE = 2000;
-  int24 public constant TICK_SPACING = 2000;
+  int24 public constant TICK_SPACING = 200;
 
   // Mapping to track adapter addresses by type
   mapping(ICLMMAdapter => bool) public adapters;
@@ -64,15 +62,12 @@ abstract contract TokenLaunchpad is ITokenLaunchpad, OwnableUpgradeable, ERC721E
   // Default creator allocation percentage
   uint16 public DEFAULT_CREATOR_ALLOCATION;
 
-  // Fees claimed by creators for a token
-  mapping(address creator => mapping(IERC20 token => mapping(uint8 tokenIndex => uint256 claimedFees))) public
-    creatorToClaimedFees;
-
   receive() external payable {}
 
   /// @inheritdoc ITokenLaunchpad
-  function initialize(address _owner, address _fundingToken) external initializer {
+  function initialize(address _owner, address _fundingToken, address _adapter) external initializer {
     fundingToken = IERC20(_fundingToken);
+    adapter = ICLMMAdapter(_adapter);
     cron = _owner;
     __Ownable_init(_owner);
     __ERC721_init("Something.fun", "somETHing");
@@ -105,7 +100,6 @@ abstract contract TokenLaunchpad is ITokenLaunchpad, OwnableUpgradeable, ERC721E
           tick0: launchTick,
           tick1: graduationTick,
           tick2: upperMaxTick,
-          fee: POOL_FEE,
           tickSpacing: TICK_SPACING,
           totalAmount: pendingBalance,
           graduationAmount: graduationLiquidity
@@ -122,13 +116,14 @@ abstract contract TokenLaunchpad is ITokenLaunchpad, OwnableUpgradeable, ERC721E
     uint256 balance = fundingToken.balanceOf(address(this));
 
     // buy 1 token
-    uint256 swapped = adapter.swapWithExactOutput(fundingToken, token, 1 ether, balance, POOL_FEE);
+    // uint256 swapped = adapter.swapWithExactOutput(fundingToken, token, 1 ether, balance);
+    uint256 swapped = 0;
 
     // if the user wants to buy more tokens, they can do so
     uint256 received;
     if (amount > 0) {
       fundingToken.transferFrom(msg.sender, address(this), amount);
-      received = adapter.swapWithExactInput(fundingToken, token, amount, 0, POOL_FEE);
+      received = adapter.swapWithExactInput(fundingToken, token, amount, 0);
     }
 
     // refund any remaining tokens
@@ -155,10 +150,6 @@ abstract contract TokenLaunchpad is ITokenLaunchpad, OwnableUpgradeable, ERC721E
 
   function claimedFees(IERC20 _token) external view returns (uint256 fee0, uint256 fee1) {
     (fee0, fee1) = adapter.claimedFees(address(_token));
-  }
-
-  function claimedFeesByCreator(address _creator, IERC20 _token) external view returns (uint256 fee0, uint256 fee1) {
-    return (creatorToClaimedFees[_creator][_token][0], creatorToClaimedFees[_creator][_token][1]);
   }
 
   /// @dev Distribute fees to the owner

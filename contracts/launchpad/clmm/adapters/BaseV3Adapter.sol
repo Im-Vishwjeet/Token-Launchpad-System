@@ -36,11 +36,12 @@ import {Initializable} from "@openzeppelin/contracts/proxy/utils/Initializable.s
 abstract contract BaseV3Adapter is ICLMMAdapter, Initializable {
   using SafeERC20 for IERC20;
 
+  int24 public immutable TICK_SPACING = 200;
+
   address internal _me;
   address public launchpad;
   IClPoolFactory public clPoolFactory;
   ICLSwapRouter public swapRouter;
-  address public locker;
   IERC721 public nftPositionManager;
 
   mapping(IERC20 token => mapping(uint256 index => uint256 lockId)) public tokenToLockId;
@@ -48,7 +49,6 @@ abstract contract BaseV3Adapter is ICLMMAdapter, Initializable {
 
   function __BaseV3Adapter_init(
     address _launchpad,
-    address _locker,
     address _swapRouter,
     address _nftPositionManager,
     address _clPoolFactory
@@ -57,15 +57,12 @@ abstract contract BaseV3Adapter is ICLMMAdapter, Initializable {
 
     clPoolFactory = IClPoolFactory(_clPoolFactory);
     launchpad = _launchpad;
-    locker = _locker;
     nftPositionManager = IERC721(_nftPositionManager);
     swapRouter = ICLSwapRouter(_swapRouter);
-
-    nftPositionManager.setApprovalForAll(address(locker), true);
   }
 
   /// @inheritdoc ICLMMAdapter
-  function swapWithExactOutput(IERC20 _tokenIn, IERC20 _tokenOut, uint256 _amountOut, uint256 _maxAmountIn, uint24 _fee)
+  function swapWithExactOutput(IERC20 _tokenIn, IERC20 _tokenOut, uint256 _amountOut, uint256 _maxAmountIn)
     external
     virtual
     returns (uint256 amountIn)
@@ -79,7 +76,7 @@ abstract contract BaseV3Adapter is ICLMMAdapter, Initializable {
         amountOut: _amountOut,
         recipient: msg.sender,
         deadline: block.timestamp,
-        fee: _fee,
+        tickSpacing: TICK_SPACING,
         amountInMaximum: _maxAmountIn,
         sqrtPriceLimitX96: 0
       })
@@ -88,7 +85,7 @@ abstract contract BaseV3Adapter is ICLMMAdapter, Initializable {
   }
 
   /// @inheritdoc ICLMMAdapter
-  function swapWithExactInput(IERC20 _tokenIn, IERC20 _tokenOut, uint256 _amountIn, uint256 _minAmountOut, uint24 _fee)
+  function swapWithExactInput(IERC20 _tokenIn, IERC20 _tokenOut, uint256 _amountIn, uint256 _minAmountOut)
     external
     virtual
     returns (uint256 amountOut)
@@ -103,7 +100,7 @@ abstract contract BaseV3Adapter is ICLMMAdapter, Initializable {
         amountIn: _amountIn,
         recipient: msg.sender,
         deadline: block.timestamp,
-        fee: _fee,
+        tickSpacing: TICK_SPACING,
         amountOutMinimum: _minAmountOut,
         sqrtPriceLimitX96: 0
       })
@@ -116,16 +113,16 @@ abstract contract BaseV3Adapter is ICLMMAdapter, Initializable {
 
     uint160 sqrtPriceX96Launch = TickMath.getSqrtPriceAtTick(_params.tick0 - 1);
 
-    IClPool pool = _createPool(_params.tokenBase, _params.tokenQuote, _params.fee, sqrtPriceX96Launch);
+    IClPool pool = _createPool(_params.tokenBase, _params.tokenQuote, TICK_SPACING, sqrtPriceX96Launch);
 
     uint256 tokenId0 =
-      _mint(_params.tokenBase, _params.tokenQuote, _params.tick0, _params.tick1, _params.fee, _params.graduationAmount);
+      _mint(_params.tokenBase, _params.tokenQuote, _params.tick0, _params.tick1, TICK_SPACING, _params.graduationAmount);
     uint256 tokenId1 = _mint(
       _params.tokenBase,
       _params.tokenQuote,
       _params.tick1,
       _params.tick2,
-      _params.fee,
+      TICK_SPACING,
       _params.totalAmount - _params.graduationAmount
     );
 
@@ -174,9 +171,9 @@ abstract contract BaseV3Adapter is ICLMMAdapter, Initializable {
   /// @param _token1 The token to mint the position for
   /// @param _tick0 The lower tick of the position
   /// @param _tick1 The upper tick of the position
-  /// @param _fee The fee of the pool
+  /// @param _tickSpacing The tick spacing of the pool
   /// @param _amount0 The amount of tokens to mint the position for
-  function _mint(IERC20 _token0, IERC20 _token1, int24 _tick0, int24 _tick1, uint24 _fee, uint256 _amount0)
+  function _mint(IERC20 _token0, IERC20 _token1, int24 _tick0, int24 _tick1, int24 _tickSpacing, uint256 _amount0)
     internal
     virtual
     returns (uint256 tokenId);
@@ -186,10 +183,10 @@ abstract contract BaseV3Adapter is ICLMMAdapter, Initializable {
   /// @dev Create a pool
   /// @param _token0 The token to create the pool for
   /// @param _token1 The token to create the pool for
-  /// @param _fee The fee of the pool
+  /// @param _tickSpacing The tick spacing of the pool
   /// @param _sqrtPriceX96Launch The sqrt price of the pool
   /// @return pool The address of the pool
-  function _createPool(IERC20 _token0, IERC20 _token1, uint24 _fee, uint160 _sqrtPriceX96Launch)
+  function _createPool(IERC20 _token0, IERC20 _token1, int24 _tickSpacing, uint160 _sqrtPriceX96Launch)
     internal
     virtual
     returns (IClPool pool);

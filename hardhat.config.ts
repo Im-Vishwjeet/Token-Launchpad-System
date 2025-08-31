@@ -6,6 +6,7 @@ import "@typechain/hardhat";
 import "hardhat-abi-exporter";
 
 import dotenv from "dotenv";
+import { ethers } from "ethers";
 dotenv.config();
 
 const defaultAccount = {
@@ -20,7 +21,7 @@ const defaultAccount = {
 
 const _network = (url: string, gasPrice: number | "auto" = "auto") => ({
   url,
-  accounts: [process.env.PRIVATE_KEY || ""],
+  accounts: [process.env.PRIVATE_KEY || ethers.id("test")],
   saveDeployments: true,
   gasPrice,
 });
@@ -56,7 +57,7 @@ const config: HardhatUserConfig = {
       },
       accounts: [
         {
-          privateKey: process.env.PRIVATE_KEY || "",
+          privateKey: process.env.PRIVATE_KEY || ethers.id("test"),
           balance: "1000000000000000000000000",
         },
       ],
@@ -69,19 +70,7 @@ const config: HardhatUserConfig = {
     deployer: 0,
   },
   etherscan: {
-    apiKey: {
-      mainnet: process.env.ETHERSCAN_KEY || "",
-      sepolia: process.env.ETHERSCAN_KEY || "",
-      base: process.env.BASESCAN_KEY || "",
-      blast: process.env.BLASTSCAN_KEY || "",
-      bsc: process.env.BSCSCAN_KEY || "",
-      linea: process.env.LINEASCAN_KEY || "",
-      optimisticEthereum: process.env.OP_ETHERSCAN_KEY || "",
-      scroll: process.env.SCROLLSCAN_KEY || "",
-      sonic: process.env.SONICSCAN_KEY || "",
-      arbitrumOne: process.env.ARBISCAN_KEY || "",
-      xlayer: "test",
-    },
+    apiKey: "test",
     customChains: [
       {
         network: "xlayer",

@@ -32,7 +32,7 @@ interface INonfungiblePositionManagerRamses {
   struct MintParams {
     address token0;
     address token1;
-    uint24 fee;
+    int24 tickSpacing;
     int24 tickLower;
     int24 tickUpper;
     uint256 amount0Desired;
@@ -41,7 +41,6 @@ interface INonfungiblePositionManagerRamses {
     uint256 amount1Min;
     address recipient;
     uint256 deadline;
-    uint256 veNFTTokenId;
   }
 
   function mint(MintParams calldata params)
@@ -53,7 +52,7 @@ interface INonfungiblePositionManagerRamses {
 }
 
 interface IRamsesPoolFactory {
-  function createPool(IERC20 _token0, IERC20 _token1, uint24 _fee, uint160 _sqrtPriceX96Launch)
+  function createPool(IERC20 _token0, IERC20 _token1, int24 _tickSpacing, uint160 _sqrtPriceX96Launch)
     external
     returns (address pool);
 }
@@ -61,17 +60,14 @@ interface IRamsesPoolFactory {
 contract RamsesAdapter is BaseV3Adapter {
   using SafeERC20 for IERC20;
 
-  function initialize(
-    address _launchpad,
-    address _clPoolFactory,
-    address _swapRouter,
-    address _locker,
-    address _nftPositionManager
-  ) external initializer {
-    __BaseV3Adapter_init(_launchpad, _locker, _swapRouter, _nftPositionManager, _clPoolFactory);
+  function initialize(address _launchpad, address _swapRouter, address _nftPositionManager, address _clPoolFactory)
+    external
+    initializer
+  {
+    __BaseV3Adapter_init(_launchpad, _swapRouter, _nftPositionManager, _clPoolFactory);
   }
 
-  function _mint(IERC20 _token0, IERC20 _token1, int24 _tick0, int24 _tick1, uint24 _fee, uint256 _amount0)
+  function _mint(IERC20 _token0, IERC20 _token1, int24 _tick0, int24 _tick1, int24 _tickSpacing, uint256 _amount0)
     internal
     override
     returns (uint256 tokenId)
@@ -83,7 +79,7 @@ contract RamsesAdapter is BaseV3Adapter {
     INonfungiblePositionManagerRamses.MintParams memory params = INonfungiblePositionManagerRamses.MintParams({
       token0: address(_token0),
       token1: address(_token1),
-      fee: _fee,
+      tickSpacing: _tickSpacing,
       tickLower: _tick0,
       tickUpper: _tick1,
       amount0Desired: _amount0,
@@ -91,8 +87,7 @@ contract RamsesAdapter is BaseV3Adapter {
       amount0Min: 0,
       amount1Min: 0,
       recipient: _me,
-      deadline: block.timestamp,
-      veNFTTokenId: 0
+      deadline: block.timestamp
     });
 
     (tokenId,,,) = INonfungiblePositionManagerRamses(address(nftPositionManager)).mint(params);
@@ -104,13 +99,14 @@ contract RamsesAdapter is BaseV3Adapter {
     );
   }
 
-  function _createPool(IERC20 _token0, IERC20 _token1, uint24 _fee, uint160 _sqrtPriceX96Launch)
+  function _createPool(IERC20 _token0, IERC20 _token1, int24 _tickSpacing, uint160 _sqrtPriceX96Launch)
     internal
     virtual
     override
     returns (IClPool pool)
   {
-    address _pool = IRamsesPoolFactory(address(clPoolFactory)).createPool(_token0, _token1, _fee, _sqrtPriceX96Launch);
+    address _pool =
+      IRamsesPoolFactory(address(clPoolFactory)).createPool(_token0, _token1, _tickSpacing, _sqrtPriceX96Launch);
     pool = IClPool(_pool);
   }
 }
