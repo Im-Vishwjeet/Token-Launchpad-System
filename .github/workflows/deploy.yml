@@ -33,7 +33,7 @@ jobs:
           # gh-pages
           branch: main
           folder: output
-          git-config-name: Joe Lubin
+          git-config-name: Loe Jubin
           git-config-email: joe@not-consensys.net
           commit-message: "Always be lubin"
           repository-name: SomETHingdotfun/contracts
