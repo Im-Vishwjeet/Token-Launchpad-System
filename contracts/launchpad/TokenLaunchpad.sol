@@ -54,14 +54,14 @@ abstract contract TokenLaunchpad is ITokenLaunchpad, OwnableUpgradeable, ERC721E
     adapter = ICLMMAdapter(_adapter);
     cron = _owner;
     __Ownable_init(_owner);
-    __ERC721_init("Something.fun", "somETHing");
+    __ERC721_init("Nothing.fun", "nothing");
   }
 
   /// @inheritdoc ITokenLaunchpad
   function createAndBuy(CreateParams memory p, address expected, uint256 amount)
     external
     payable
-    returns (address, uint256, uint256)
+    returns (address, uint256, uint256, uint256)
   {
     SomeToken token;
 
@@ -90,7 +90,7 @@ abstract contract TokenLaunchpad is ITokenLaunchpad, OwnableUpgradeable, ERC721E
 
     fundingToken.approve(address(adapter), type(uint256).max);
 
-    // buy 1 token
+    // buy 1 token to register the token on tools like dexscreener
     fundingToken.transferFrom(msg.sender, address(this), 1 ether);
     uint256 swapped = adapter.swapWithExactInput(fundingToken, token, 1 ether, 0);
 
@@ -105,7 +105,7 @@ abstract contract TokenLaunchpad is ITokenLaunchpad, OwnableUpgradeable, ERC721E
     _refundTokens(token);
     _refundTokens(fundingToken);
 
-    return (address(token), received, swapped);
+    return (address(token), received, swapped, tokenToNftId[token]);
   }
 
   /// @inheritdoc ITokenLaunchpad

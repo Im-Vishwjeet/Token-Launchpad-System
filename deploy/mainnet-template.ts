@@ -118,7 +118,10 @@ export const deployTokenSimple = async (
   );
 
   const data: ITokenLaunchpad.CreateParamsStruct = {
-    adapter: adapter.target,
+    salt,
+    metadata,
+    name,
+    symbol,
     creatorAllocation: 0,
     fundingToken,
     launchPoolAmounts: [],
@@ -136,14 +139,9 @@ export const deployTokenSimple = async (
     },
   };
 
-  const creationFee = await launchpad.creationFee();
-  const dust = 10000000000000n;
-
   // create a launchpad token
   await waitForTx(
-    await launchpad.createAndBuy(data, computedAddress, amountToBuy, hre.ethers.ZeroHash, false, {
-      value: creationFee + dust,
-    })
+    await launchpad.createAndBuy(data, computedAddress, amountToBuy)
   );
 
   console.log("Simple Token deployed at", computedAddress);
@@ -253,9 +251,16 @@ export const deployTokenPremium = async (
     )
   );
   await waitForTx(
-    await launchpad.createAndBuy(data, computedAddress, amountToBuy, "", false, {
-      value: creationFee + dust,
-    })
+    await launchpad.createAndBuy(
+      data,
+      computedAddress,
+      amountToBuy,
+      "",
+      false,
+      {
+        value: creationFee + dust,
+      }
+    )
   );
 
   return hre.ethers.getContractAt("WAGMIEToken", computedAddress);

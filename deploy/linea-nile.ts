@@ -17,13 +17,13 @@ async function main(hre: HardhatRuntimeEnvironment) {
   // Deploy SOMETHING contract
   const something = await deployContract(
     hre,
-    "SomeToken",
+    "SomeMasterToken",
     [],
     "somETHing",
     deployer
   );
 
-  console.log("SOMETHING contract deployed at:", something.address);
+  console.log("SomeMasterToken contract deployed at:", something.address);
 
   const { launchpad, swapper } = await templateLaunchpad(
     hre,
@@ -59,16 +59,6 @@ async function main(hre: HardhatRuntimeEnvironment) {
     )
   );
   console.log("Default value parameters set successfully!");
-
-  // Set fee settings
-  await waitForTx(
-    await launchpad.setFeeSettings(
-      "0x5135f3A6aC33C8616b5ee59b89afc1021D1a8086",
-      2000000000000000n,
-      1000n * e18
-    )
-  );
-  console.log("Fee settings set");
 
   // CONTRACTS ARE DEPLOYED; NOW WE CAN LAUNCH A NEW TOKEN
 
