@@ -62,7 +62,7 @@ export async function deployProxy(
 
   const proxy = await deploy(`${name}-Proxy`, {
     from: sender || deployer,
-    contract: "MAHAProxy",
+    contract: "SomeProxy",
     skipIfAlreadyDeployed: true,
     args: [implementationD.address, proxyAdmin, argsInit],
     autoMine: true,
@@ -110,8 +110,8 @@ export async function upgradeProxy(
     });
 
     // Get the proxy contract with the correct interface
-    const proxy = await hre.ethers.getContractAt("IMAHAProxy", proxyAddress);
-    
+    const proxy = await hre.ethers.getContractAt("ISomeProxy", proxyAddress);
+
     // Get the contract interface for encoding initialization data
     const contract = await hre.ethers.getContractAt(
       newImplementationName,
@@ -119,12 +119,15 @@ export async function upgradeProxy(
     );
 
     // Encode initialization data if args are provided
-    const argsInit = args.length > 0 
-      ? contract.interface.encodeFunctionData("initialize", args)
-      : "0x";
+    const argsInit =
+      args.length > 0
+        ? contract.interface.encodeFunctionData("initialize", args)
+        : "0x";
 
     // Upgrade the proxy to the new implementation
-    console.log(`Upgrading proxy to new implementation at ${newImpl.address}...`);
+    console.log(
+      `Upgrading proxy to new implementation at ${newImpl.address}...`
+    );
     const tx = await proxy.upgradeToAndCall(newImpl.address, argsInit);
     const receipt = await tx.wait();
     if (!receipt) {

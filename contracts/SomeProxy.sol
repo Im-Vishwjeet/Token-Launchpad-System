@@ -27,16 +27,16 @@ import {ERC1967Proxy} from "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.s
 import {ERC1967Utils} from "@openzeppelin/contracts/proxy/ERC1967/ERC1967Utils.sol";
 
 /**
- * @dev Interface for {MAHAProxy}. In order to implement transparency, {MAHAProxy}
+ * @dev Interface for {SomeProxy}. In order to implement transparency, {SomeProxy}
  * does not implement this interface directly, and its upgradeability mechanism is implemented by an internal dispatch
- * mechanism. The compiler is unaware that these functions are implemented by {MAHAProxy} and will not
+ * mechanism. The compiler is unaware that these functions are implemented by {SomeProxy} and will not
  * include them in the ABI so this interface must be used to interact with it.
  */
-interface IMAHAProxy is IERC1967 {
+interface ISomeProxy is IERC1967 {
   function upgradeToAndCall(address, bytes calldata) external payable;
 }
 
-contract MAHAProxy is ERC1967Proxy {
+contract SomeProxy is ERC1967Proxy {
   // An immutable address for the admin to avoid unnecessary SLOADs before each call
   // at the expense of removing the ability to change the admin once it's set.
   // This is acceptable if the admin is always a ProxyAdmin instance or similar contract
@@ -72,7 +72,7 @@ contract MAHAProxy is ERC1967Proxy {
    */
   function _fallback() internal virtual override {
     if (msg.sender == proxyAdmin()) {
-      if (msg.sig != IMAHAProxy.upgradeToAndCall.selector) {
+      if (msg.sig != ISomeProxy.upgradeToAndCall.selector) {
         revert ProxyDeniedAdminAccess();
       } else {
         _dispatchUpgradeToAndCall();
