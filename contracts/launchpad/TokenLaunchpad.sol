@@ -1,4 +1,24 @@
 // SPDX-License-Identifier: BUSL-1.1
+
+// ▗▖   ▗▞▀▚▖█ ▄ ▗▞▀▚▖▄   ▄ ▗▞▀▚▖
+// ▐▌   ▐▛▀▀▘█ ▄ ▐▛▀▀▘█   █ ▐▛▀▀▘
+// ▐▛▀▚▖▝▚▄▄▖█ █ ▝▚▄▄▖ ▀▄▀  ▝▚▄▄▖
+// ▐▙▄▞▘     █ █
+
+// ▄ ▄▄▄▄
+// ▄ █   █
+// █ █   █
+// █
+
+//  ▄▄▄  ▄▄▄  ▄▄▄▄  ▗▄▄▄▖▗▄▄▄▖▗▖ ▗▖▄ ▄▄▄▄
+// ▀▄▄  █   █ █ █ █ ▐▌     █  ▐▌ ▐▌▄ █   █
+// ▄▄▄▀ ▀▄▄▄▀ █   █ ▐▛▀▀▘  █  ▐▛▀▜▌█ █   █
+//                  ▐▙▄▄▖  █  ▐▌ ▐▌█     ▗▄▖
+//                                      ▐▌ ▐▌
+//                                       ▝▀▜▌
+//                                      ▐▙▄▞▘
+
+// Website: https://something.fun
 pragma solidity ^0.8.0;
 
 import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
@@ -6,7 +26,7 @@ import {ERC721EnumerableUpgradeable} from
   "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721EnumerableUpgradeable.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
-import {SOMETHINGToken} from "contracts/SOMETHINGToken.sol";
+import {SomeToken} from "contracts/SomeToken.sol";
 import {ICLMMAdapter} from "contracts/interfaces/ICLMMAdapter.sol";
 
 import {IReferralDistributor} from "contracts/interfaces/IReferralDistributor.sol";
@@ -41,7 +61,8 @@ abstract contract TokenLaunchpad is ITokenLaunchpad, OwnableUpgradeable, ERC721E
   uint16 public DEFAULT_CREATOR_ALLOCATION;
 
   // Fees claimed by creators for a token
-  mapping(address creator => mapping(IERC20 token => mapping(uint8 tokenIndex => uint256 claimedFees))) public creatorToClaimedFees;
+  mapping(address creator => mapping(IERC20 token => mapping(uint8 tokenIndex => uint256 claimedFees))) public
+    creatorToClaimedFees;
 
   receive() external payable {}
 
@@ -50,7 +71,7 @@ abstract contract TokenLaunchpad is ITokenLaunchpad, OwnableUpgradeable, ERC721E
     fundingToken = IERC20(_fundingToken);
     cron = _owner;
     __Ownable_init(_owner);
-    __ERC721_init("Something Launchpad", "SOMETHING");
+    __ERC721_init("Something.fun", "somETHing");
   }
 
   /// @inheritdoc ITokenLaunchpad
@@ -131,12 +152,7 @@ abstract contract TokenLaunchpad is ITokenLaunchpad, OwnableUpgradeable, ERC721E
   }
 
   /// @inheritdoc ITokenLaunchpad
-  function createAndBuy(
-    CreateParams memory p,
-    address expected,
-    uint256 amount,
-    bool burnPosition
-  )
+  function createAndBuy(CreateParams memory p, address expected, uint256 amount, bool burnPosition)
     external
     payable
     returns (address, uint256, uint256)
@@ -148,11 +164,11 @@ abstract contract TokenLaunchpad is ITokenLaunchpad, OwnableUpgradeable, ERC721E
     p.valueParams = getDefaultValueParams(p.fundingToken, p.adapter);
     p.fundingToken.transferFrom(msg.sender, address(this), 1000 ether);
 
-    SOMETHINGToken token;
+    SomeToken token;
 
     {
       bytes32 salt = keccak256(abi.encode(p.salt, msg.sender, p.name, p.symbol));
-      token = new SOMETHINGToken{salt: salt}(p.name, p.symbol);
+      token = new SomeToken{salt: salt}(p.name, p.symbol);
       require(expected == address(0) || address(token) == expected, "Invalid token address");
 
       tokenToNftId[token] = tokens.length;

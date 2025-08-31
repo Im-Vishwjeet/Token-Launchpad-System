@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity 0.8.26;
 
-import {WAGMIEToken} from "contracts/WAGMIEToken.sol";
+import {SomeToken} from "contracts/SomeToken.sol";
 import {IERC20, ITokenLaunchpad} from "contracts/interfaces/ITokenLaunchpad.sol";
 import {TokenLaunchpad} from "contracts/launchpad/TokenLaunchpad.sol";
 
@@ -45,7 +45,7 @@ contract TokenLaunchpadTest is Test {
     returns (bytes32)
   {
     // Get the runtime bytecode of WAGMIEToken
-    bytes memory bytecode = type(WAGMIEToken).creationCode;
+    bytes memory bytecode = type(SomeToken).creationCode;
 
     // Maximum number of attempts to find a valid address
     uint256 maxAttempts = 100;

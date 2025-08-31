@@ -1,4 +1,24 @@
 // SPDX-License-Identifier: BUSL-1.1
+
+// ▗▖   ▗▞▀▚▖█ ▄ ▗▞▀▚▖▄   ▄ ▗▞▀▚▖
+// ▐▌   ▐▛▀▀▘█ ▄ ▐▛▀▀▘█   █ ▐▛▀▀▘
+// ▐▛▀▚▖▝▚▄▄▖█ █ ▝▚▄▄▖ ▀▄▀  ▝▚▄▄▖
+// ▐▙▄▞▘     █ █
+
+// ▄ ▄▄▄▄
+// ▄ █   █
+// █ █   █
+// █
+
+//  ▄▄▄  ▄▄▄  ▄▄▄▄  ▗▄▄▄▖▗▄▄▄▖▗▖ ▗▖▄ ▄▄▄▄
+// ▀▄▄  █   █ █ █ █ ▐▌     █  ▐▌ ▐▌▄ █   █
+// ▄▄▄▀ ▀▄▄▄▀ █   █ ▐▛▀▀▘  █  ▐▛▀▜▌█ █   █
+//                  ▐▙▄▄▖  █  ▐▌ ▐▌█     ▗▄▖
+//                                      ▐▌ ▐▌
+//                                       ▝▀▜▌
+//                                      ▐▙▄▞▘
+
+// Website: https://something.fun
 pragma solidity ^0.8.0;
 
 import {BaseV3Adapter, IClPool, IERC20, SafeERC20} from "./BaseV3Adapter.sol";
@@ -110,8 +130,5 @@ contract RamsesAdapter is BaseV3Adapter {
   {
     // mint the position
     uint256 tokenId = _mint(_token0, _token1, _tick0, _tick1, _fee, _amount0);
-
-    // burn the position
-    nftPositionManager.transferFrom(address(this), address(0), tokenId);
   }
 }
