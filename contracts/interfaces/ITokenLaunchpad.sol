@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: BUSL-1.1
+// SPDX-License-Identifier: AGPL-3.0-or-later
 pragma solidity ^0.8.0;
 
 import {ICLMMAdapter} from "./ICLMMAdapter.sol";
@@ -193,5 +193,8 @@ interface ITokenLaunchpad {
   /// @param _token The token to get the claimed fees for
   /// @return claimedFees0 The claimed fees for the token
   /// @return claimedFees1 The claimed fees for the token
-  function claimedFeesByCreator(address _creator, IERC20 _token) external view returns (uint256 claimedFees0, uint256 claimedFees1);
+  function claimedFeesByCreator(address _creator, IERC20 _token)
+    external
+    view
+    returns (uint256 claimedFees0, uint256 claimedFees1);
 }
