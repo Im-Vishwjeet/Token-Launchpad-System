@@ -11,13 +11,12 @@ export async function templateLaunchpad(
   proxyAdmin: string,
   launchpadContract: string,
   wethAddress: string,
-  odosAddress: string,
-  mahaAddress: string
+  odosAddress: string
 ) {
   const launchpadD = await deployProxy(
     hre,
     launchpadContract,
-    [deployer, wethAddress, mahaAddress],
+    [deployer, wethAddress],
     proxyAdmin,
     launchpadContract,
     deployer
@@ -73,10 +72,10 @@ export async function deployAdapter(
     adapterD.address
   );
 
-  if (!(await args.launchpad.adapters(adapter))) {
-    console.log("whitelisting adapter");
-    await waitForTx(await args.launchpad.toggleAdapter(adapter));
-  }
+  // if (!(await args.launchpad.adapters(adapter))) {
+  //   console.log("whitelisting adapter");
+  //   await waitForTx(await args.launchpad.toggleAdapter(adapter));
+  // }
 
   return adapter;
 }
@@ -122,9 +121,7 @@ export const deployTokenSimple = async (
     adapter: adapter.target,
     creatorAllocation: 0,
     fundingToken,
-    isPremium: false,
     launchPoolAmounts: [],
-    launchPools: [],
     metadata,
     name,
     salt,
@@ -144,7 +141,7 @@ export const deployTokenSimple = async (
 
   // create a launchpad token
   await waitForTx(
-    await launchpad.createAndBuy(data, computedAddress, amountToBuy, "", false, {
+    await launchpad.createAndBuy(data, computedAddress, amountToBuy, hre.ethers.ZeroHash, false, {
       value: creationFee + dust,
     })
   );
@@ -222,9 +219,7 @@ export const deployTokenPremium = async (
     adapter: adapter.target,
     creatorAllocation: 0,
     fundingToken,
-    isPremium: true,
     launchPoolAmounts: [],
-    launchPools: [],
     metadata,
     name,
     salt,

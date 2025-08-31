@@ -1,58 +1,86 @@
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { RamsesAdapter } from "../types";
-import { deployTokenSimple, templateLaunchpad } from "./mainnet-template";
+import { deployAdapter, deployTokenSimple, templateLaunchpad } from "./mainnet-template";
 import { deployContract, waitForTx } from "../scripts/utils";
 
 async function main(hre: HardhatRuntimeEnvironment) {
-  const deployer = "0x1F09Ec21d7fd0A21879b919bf0f9C46e6b85CA8b";
-  const proxyAdmin = "0x7202136d70026DA33628dD3f3eFccb43F62a2469";
+  const deployer = "0xeD3Af36D7b9C5Bbd7ECFa7fb794eDa6E242016f5";
+  const proxyAdmin = "0x5135f3A6aC33C8616b5ee59b89afc1021D1a8086";
   const wethAddressOnLinea = "0xe5d7c2a44ffddf6b295a15c148167daaaf5cf34f";
   const odosAddressOnLinea = "0x2d8879046f1559E53eb052E949e9544bCB72f414";
   const nftPositionManager = "0xAAA78E8C4241990B4ce159E105dA08129345946A";
-  const mahaAddress = "0x6a661312938d22a2a0e27f585073e4406903990a";
   const e18 = 10n ** 18n;
-  const feeDiscountAmount = 1000n * e18; // 100%
 
-  const { adapter, launchpad } = await templateLaunchpad(
+  // Deploy SOMETHING contract
+  const something = await deployContract(
+    hre,
+    "SOMETHING",
+    ["SOMETHING Token", "SOMETHING"],
+    "SOMETHING",
+    deployer
+  );
+
+  console.log("SOMETHING contract deployed at:", something.address);
+
+  const {launchpad, swapper } = await templateLaunchpad(
     hre,
     deployer,
     proxyAdmin,
-    "RamsesAdapter",
     "TokenLaunchpadLinea",
-    wethAddressOnLinea,
-    odosAddressOnLinea,
-    mahaAddress,
-    feeDiscountAmount
+    something.address,
+    odosAddressOnLinea
   );
 
-  const locker = "0x0000BF531058EE5eC27417F96eBb1D7Bb8ccF4db";
+  const adapterNile = await deployAdapter(
+    hre,
+    "RamsesAdapter",
+    {
+      launchpad,
+      wethAddress: wethAddressOnLinea,
+      nftPositionManager,
+      swapRouter: "0xAAAE99091Fbb28D400029052821653C1C752483B",
+      locker: "0x0000BF531058EE5eC27417F96eBb1D7Bb8ccF4db",
+      clPoolFactory: "0xAAA32926fcE6bE95ea2c51cB4Fcb60836D320C42"
+    }
+  );
 
-  // initialize the contracts if they are not initialized
-  const adapterNile = adapter as RamsesAdapter;
-  if ((await adapterNile.launchpad()) !== launchpad.target) {
-    await waitForTx(
-      await adapterNile.initialize(
-        launchpad.target,
-        "0xAAA32926fcE6bE95ea2c51cB4Fcb60836D320C42",
-        "0xAAAE99091Fbb28D400029052821653C1C752483B",
-        wethAddressOnLinea,
-        locker,
-        nftPositionManager
-      )
-    );
-  }
+  // Set default value parameters
+  await waitForTx(
+    await launchpad.setDefaultValueParams(
+      something.address, // _token - using SOMETHING contract
+      adapterNile.target, // _adapter - using the deployed RamsesAdapter
+      {
+        fee: 3000,
+        graduationLiquidity: 800000000000000000000000000n,
+        graduationTick: -160500,
+        launchTick: -186600,
+        tickSpacing: 60,
+        upperMaxTick: 885000
+      }
+    )
+  );
+  console.log("Default value parameters set successfully!");
+
+  // Set fee settings
+  await waitForTx(
+    await launchpad.setFeeSettings(
+      "0x5135f3A6aC33C8616b5ee59b89afc1021D1a8086",
+      2000000000000000n,
+      1000n * e18
+    )
+  );
+  console.log("Fee settings set");
 
   // CONTRACTS ARE DEPLOYED; NOW WE CAN LAUNCH A NEW TOKEN
 
   // setup parameters
   const name = "Test Token";
   const symbol = "TEST";
-  const tickSpacing = 500; // tick spacing for 2% fee
   const metadata = JSON.stringify({ image: "https://i.imgur.com/56aQaCV.png" });
 
   if ((await launchpad.creationFee()) == 0n) {
     // 5$ in eth
-    const efrogsTreasury = "0x4c11F940E2D09eF9D5000668c1C9410f0AaF0833";
+    const efrogsTreasury = "0x5135f3A6aC33C8616b5ee59b89afc1021D1a8086";
     await waitForTx(
       await launchpad.setFeeSettings(
         efrogsTreasury,
@@ -60,9 +88,10 @@ async function main(hre: HardhatRuntimeEnvironment) {
         1000n * e18
       )
     );
+    console.log("Fee settings set");
   }
 
-  const shouldMock = true;
+  const shouldMock = false;
   if (shouldMock) {
     // const mahaD = await deployContract(
     //   hre,
@@ -80,14 +109,11 @@ async function main(hre: HardhatRuntimeEnvironment) {
 
     const token2 = await deployTokenSimple(
       hre,
+      adapterNile,
       deployer,
       name,
       symbol,
-      1800, // price of token in USD
-      tickSpacing,
       metadata,
-      5000, // 5,000$ starting market cap
-      69000, // 69,000$ ending market cap
       wethAddressOnLinea,
       launchpad,
       0n

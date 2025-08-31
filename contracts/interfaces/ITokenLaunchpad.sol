@@ -1,21 +1,8 @@
 // SPDX-License-Identifier: BUSL-1.1
-
-// ███╗   ███╗ █████╗ ██╗  ██╗ █████╗
-// ████╗ ████║██╔══██╗██║  ██║██╔══██╗
-// ██╔████╔██║███████║███████║███████║
-// ██║╚██╔╝██║██╔══██║██╔══██║██╔══██║
-// ██║ ╚═╝ ██║██║  ██║██║  ██║██║  ██║
-// ╚═╝     ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝
-
-// Website: https://wagmie.com
-// Telegram: https://t.me/mahaxyz
-// Twitter: https://twitter.com/mahaxyz_
-
 pragma solidity ^0.8.0;
 
 import {ICLMMAdapter} from "./ICLMMAdapter.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import {ILaunchpool} from "contracts/interfaces/ILaunchpool.sol";
 
 /// @title ITokenLaunchpad Interface
 /// @notice Interface for the TokenLaunchpad contract that handles token launches
@@ -29,22 +16,16 @@ interface ITokenLaunchpad {
   /// @param launchTick The tick at which the token launches
   /// @param graduationTick The tick that must be reached for graduation
   /// @param upperMaxTick The maximum tick allowed
-  /// @param isPremium Whether the token is premium
   /// @param graduationLiquidity The liquidity at graduation
-  /// @param launchPoolAllocations The launchpool allocations
-  /// @param creatorAllocation Percentage of total supply to allocate to creator (max 5%)
   /// @param fee The fee for the token liquidity pair
   /// @param adapter The adapter used for the token launch
   struct CreateParams {
-    bool isPremium;
     bytes32 salt;
     ICLMMAdapter adapter;
     IERC20 fundingToken;
-    ILaunchpool[] launchPools;
     string metadata;
     string name;
     string symbol;
-    uint16 creatorAllocation;
     uint256[] launchPoolAmounts;
     ValueParams valueParams;
   }
@@ -117,8 +98,7 @@ interface ITokenLaunchpad {
   /// @notice Initializes the launchpad contract
   /// @param _owner The owner address
   /// @param _weth The WETH9 contract address
-  /// @param _premiumToken The token used for fee discount
-  function initialize(address _owner, address _weth, address _premiumToken) external;
+  function initialize(address _owner, address _weth) external;
 
   /// @notice Toggles the whitelist for an address
   /// @param _address The address to toggle the whitelist for
@@ -176,12 +156,11 @@ interface ITokenLaunchpad {
   /// @param p The parameters for the token launch
   /// @param expected The expected address where token will be deployed
   /// @param amount The amount of tokens to buy
-  /// @param merkleRoot The merkle root for the airdrop
   /// @param burnPosition Whether to burn the position
   /// @return token The address of the newly created token
   /// @return received The amount of tokens received if the user chooses to buy at launch
   /// @return swapped The amount of tokens swapped if the user chooses to swap at launch
-  function createAndBuy(CreateParams memory p, address expected, uint256 amount, bytes32 merkleRoot, bool burnPosition)
+  function createAndBuy(CreateParams memory p, address expected, uint256 amount, bool burnPosition)
     external
     payable
     returns (address token, uint256 received, uint256 swapped);
