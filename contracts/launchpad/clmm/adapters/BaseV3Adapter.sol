@@ -38,6 +38,9 @@ abstract contract BaseV3Adapter is ICLMMAdapter, Initializable {
 
   int24 public immutable TICK_SPACING = 200;
 
+  uint256 public immutable GRADUATION_AMOUNT = 600_000_000 * 1e18;
+  uint256 public immutable POST_GRADUATION_AMOUNT = 400_000_000 * 1e18;
+
   address internal _me;
   address public launchpad;
   IClPoolFactory public clPoolFactory;
@@ -116,15 +119,9 @@ abstract contract BaseV3Adapter is ICLMMAdapter, Initializable {
     IClPool pool = _createPool(_params.tokenBase, _params.tokenQuote, TICK_SPACING, sqrtPriceX96Launch);
 
     uint256 tokenId0 =
-      _mint(_params.tokenBase, _params.tokenQuote, _params.tick0, _params.tick1, TICK_SPACING, _params.graduationAmount);
-    uint256 tokenId1 = _mint(
-      _params.tokenBase,
-      _params.tokenQuote,
-      _params.tick1,
-      _params.tick2,
-      TICK_SPACING,
-      _params.totalAmount - _params.graduationAmount
-    );
+      _mint(_params.tokenBase, _params.tokenQuote, _params.tick0, _params.tick1, TICK_SPACING, GRADUATION_AMOUNT);
+    uint256 tokenId1 =
+      _mint(_params.tokenBase, _params.tokenQuote, _params.tick1, _params.tick2, TICK_SPACING, POST_GRADUATION_AMOUNT);
 
     tokenToLockId[IERC20(_params.tokenBase)][0] = tokenId0;
     tokenToLockId[IERC20(_params.tokenBase)][1] = tokenId1;

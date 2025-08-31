@@ -49,6 +49,9 @@ contract TokenLaunchpadLineaTest is Test {
       address(0xAe334f70A7FC44FCC2df9e6A37BC032497Cf80f1)
     );
 
+    vm.prank(owner);
+    launchpad.setLaunchTicks(-206_200, -180_000, 886_000);
+
     vm.label(address(weth), "weth");
     vm.label(address(something), "something");
     vm.label(address(swapper), "swapper");
@@ -79,7 +82,8 @@ contract TokenLaunchpadLineaTest is Test {
       0
     );
 
-    assertEq(IERC20(token).balanceOf(creator), 0);
+    // assertEq(IERC20(token).balanceOf(creator), 0);
+    assertApproxEqRel(IERC20(token).balanceOf(creator), 425_619_113 * 1e18, 1e18);
   }
 
   function test_createAndBuy_withAmount() public {

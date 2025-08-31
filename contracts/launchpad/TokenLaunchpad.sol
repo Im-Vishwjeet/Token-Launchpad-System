@@ -37,30 +37,14 @@ abstract contract TokenLaunchpad is ITokenLaunchpad, OwnableUpgradeable, ERC721E
   ICLMMAdapter public adapter;
   IERC20[] public tokens;
   IERC20 public fundingToken;
-  uint256 public creationFee;
   address public cron;
 
-  mapping(IERC20 => CreateParams) public launchParams;
   mapping(IERC20 => uint256) public tokenToNftId;
-  mapping(address => bool) public whitelisted;
-
   mapping(IERC20 => mapping(ICLMMAdapter => ValueParams)) public defaultValueParams;
 
-  int24 public immutable launchTick = -206_200;
-  int24 public immutable graduationTick = -180_000;
-  int24 public immutable upperMaxTick = 886_000;
-  uint256 public immutable graduationLiquidity = 600_000_000 * 1e18; // 60%
-
-  // Maximum allowed creator allocation percentage (5%)
-  uint16 public immutable MAX_CREATOR_ALLOCATION = 500;
-
-  int24 public constant TICK_SPACING = 200;
-
-  // Mapping to track adapter addresses by type
-  mapping(ICLMMAdapter => bool) public adapters;
-
-  // Default creator allocation percentage
-  uint16 public DEFAULT_CREATOR_ALLOCATION;
+  int24 public launchTick;
+  int24 public graduationTick;
+  int24 public upperMaxTick;
 
   receive() external payable {}
 
@@ -88,9 +72,6 @@ abstract contract TokenLaunchpad is ITokenLaunchpad, OwnableUpgradeable, ERC721E
 
       tokenToNftId[token] = tokens.length;
       tokens.push(token);
-      launchParams[token] = p;
-
-      uint256 pendingBalance = token.balanceOf(address(this));
 
       token.approve(address(adapter), type(uint256).max);
       address pool = adapter.addSingleSidedLiquidity(
@@ -99,10 +80,7 @@ abstract contract TokenLaunchpad is ITokenLaunchpad, OwnableUpgradeable, ERC721E
           tokenQuote: fundingToken,
           tick0: launchTick,
           tick1: graduationTick,
-          tick2: upperMaxTick,
-          tickSpacing: TICK_SPACING,
-          totalAmount: pendingBalance,
-          graduationAmount: graduationLiquidity
+          tick2: upperMaxTick
         })
       );
       emit TokenLaunched(token, address(adapter), pool, p);
@@ -112,12 +90,9 @@ abstract contract TokenLaunchpad is ITokenLaunchpad, OwnableUpgradeable, ERC721E
 
     fundingToken.approve(address(adapter), type(uint256).max);
 
-    // buy a small amount of tokens to register the token on tools like dexscreener
-    uint256 balance = fundingToken.balanceOf(address(this));
-
     // buy 1 token
-    // uint256 swapped = adapter.swapWithExactOutput(fundingToken, token, 1 ether, balance);
-    uint256 swapped = 0;
+    fundingToken.transferFrom(msg.sender, address(this), 1 ether);
+    uint256 swapped = adapter.swapWithExactInput(fundingToken, token, 1 ether, 0);
 
     // if the user wants to buy more tokens, they can do so
     uint256 received;
@@ -128,7 +103,7 @@ abstract contract TokenLaunchpad is ITokenLaunchpad, OwnableUpgradeable, ERC721E
 
     // refund any remaining tokens
     _refundTokens(token);
-    // _refundTokens(fundingToken);
+    _refundTokens(fundingToken);
 
     return (address(token), received, swapped);
   }
@@ -136,6 +111,16 @@ abstract contract TokenLaunchpad is ITokenLaunchpad, OwnableUpgradeable, ERC721E
   /// @inheritdoc ITokenLaunchpad
   function getTotalTokens() external view returns (uint256) {
     return tokens.length;
+  }
+
+  function setLaunchTicks(int24 _launchTick, int24 _graduationTick, int24 _upperMaxTick) external {
+    require(msg.sender == cron || msg.sender == owner(), "!cron");
+    _updateLaunchTicks(_launchTick, _graduationTick, _upperMaxTick);
+  }
+
+  function setCron(address _cron) external onlyOwner {
+    cron = _cron;
+    emit CronUpdated(_cron);
   }
 
   /// @inheritdoc ITokenLaunchpad
@@ -168,5 +153,12 @@ abstract contract TokenLaunchpad is ITokenLaunchpad, OwnableUpgradeable, ERC721E
     uint256 remaining = _token.balanceOf(address(this));
     if (remaining == 0) return;
     _token.safeTransfer(msg.sender, remaining);
+  }
+
+  function _updateLaunchTicks(int24 _launchTick, int24 _graduationTick, int24 _upperMaxTick) internal {
+    launchTick = _launchTick;
+    graduationTick = _graduationTick;
+    upperMaxTick = _upperMaxTick;
+    emit LaunchTicksUpdated(_launchTick, _graduationTick, _upperMaxTick);
   }
 }

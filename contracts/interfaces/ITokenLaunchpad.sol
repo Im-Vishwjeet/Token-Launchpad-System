@@ -59,16 +59,6 @@ interface ITokenLaunchpad {
   /// @param amount The amount of tokens allocated to the creator
   event CreatorAllocation(IERC20 indexed token, address indexed creator, uint256 amount);
 
-  /// @notice Emitted when an adapter is set
-  /// @param _adapter The adapter address
-  /// @param _enabled Whether the adapter is enabled
-  event AdapterSet(address indexed _adapter, bool _enabled);
-
-  /// @notice Emitted when a whitelist is updated
-  /// @param _address The address that was updated
-  /// @param _whitelisted Whether the address is whitelisted
-  event WhitelistUpdated(address indexed _address, bool _whitelisted);
-
   /// @notice Emitted when the cron is updated
   /// @param newCron The new cron address
   event CronUpdated(address indexed newCron);
@@ -77,13 +67,11 @@ interface ITokenLaunchpad {
   /// @param metadataUrl The new metadata URL
   event MetadataUrlUpdated(string metadataUrl);
 
-  /// @notice Emitted when the default creator allocation is updated
-  /// @param _creatorAllocation The new default creator allocation percentage
-  event DefaultCreatorAllocationSet(uint256 _creatorAllocation);
-
-  /// @notice Emitted when the airdrop rewarder is set
-  /// @param _airdropRewarder The address of the airdrop rewarder
-  event AirdropRewarderSet(address indexed _airdropRewarder);
+  /// @notice Emitted when the launch ticks are updated
+  /// @param _launchTick The new launch tick
+  /// @param _graduationTick The new graduation tick
+  /// @param _upperMaxTick The new upper max tick
+  event LaunchTicksUpdated(int24 _launchTick, int24 _graduationTick, int24 _upperMaxTick);
 
   /// @notice Emitted when a fee is claimed for a token
   /// @param _token The token that the fee was claimed for
