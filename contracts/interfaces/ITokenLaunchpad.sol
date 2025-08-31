@@ -21,13 +21,9 @@ interface ITokenLaunchpad {
   /// @param adapter The adapter used for the token launch
   struct CreateParams {
     bytes32 salt;
-    ICLMMAdapter adapter;
-    IERC20 fundingToken;
     string metadata;
     string name;
     string symbol;
-    uint256[] launchPoolAmounts;
-    ValueParams valueParams;
   }
 
   // Contains numeric launch parameters
@@ -100,70 +96,29 @@ interface ITokenLaunchpad {
   /// @param _weth The WETH9 contract address
   function initialize(address _owner, address _weth) external;
 
-  /// @notice Toggles the whitelist for an address
-  /// @param _address The address to toggle the whitelist for
-  function toggleWhitelist(address _address) external;
-
-  /// @notice Sets the value parameters for a token
-  /// @param _token The token to set the value parameters for
-  /// @param _adapter The adapter to set the value parameters for
-  /// @param _params The value parameters to set
-  function setDefaultValueParams(IERC20 _token, ICLMMAdapter _adapter, ValueParams memory _params) external;
-
-  /// @notice Sets the cron address
-  /// @param _cron The new cron address
-  function setCron(address _cron) external;
-
-  /// @notice Sets the default creator allocation
-  /// @param _creatorAllocation The new default creator allocation percentage
-  function setDefaultCreatorAllocation(uint16 _creatorAllocation) external;
-
-  /// @notice Gets the quote token for a token
-  /// @param _token The token to get the quote token for
-  /// @return quoteToken The quote token for the token
-  function getQuoteToken(IERC20 _token) external view returns (IERC20 quoteToken);
-
-  /// @notice Gets the value parameters for a token
-  /// @param _token The token to get the value parameters for
-  /// @return params The value parameters for the token
-  function getDefaultValueParams(IERC20 _token, ICLMMAdapter _adapter)
-    external
-    view
-    returns (ValueParams memory params);
-
-  /// @notice Gets the adapter for a token
-  /// @param _token The token to get the adapter for
-  /// @return adapter The adapter for the token
-  function getTokenAdapter(IERC20 _token) external view returns (ICLMMAdapter);
-
-  /// @notice Gets the fee for a token
-  /// @param _token The token to get the fee for
-  /// @return fee The fee for the token
-  function getTokenFee(IERC20 _token) external view returns (uint24 fee);
-
-  /// @notice Updates the referral settings
-  /// @param _referralDestination The address to receive referrals
-  /// @param _referralFee The new referral fee amount
-  function setReferralSettings(address _referralDestination, uint256 _referralFee) external;
-
-  /// @notice Updates the fee settings
-  /// @param _feeDestination The address to receive fees
-  /// @param _fee The new fee amount
-  /// @param _feeDiscountAmount The amount of fee discount
-  function setFeeSettings(address _feeDestination, uint256 _fee, uint256 _feeDiscountAmount) external;
+  /// @notice Gets the funding token
+  /// @return fundingToken The funding token
+  function fundingToken() external view returns (IERC20 fundingToken);
 
   /// @notice Creates a new token launch
   /// @param p The parameters for the token launch
   /// @param expected The expected address where token will be deployed
   /// @param amount The amount of tokens to buy
-  /// @param burnPosition Whether to burn the position
   /// @return token The address of the newly created token
   /// @return received The amount of tokens received if the user chooses to buy at launch
   /// @return swapped The amount of tokens swapped if the user chooses to swap at launch
-  function createAndBuy(CreateParams memory p, address expected, uint256 amount, bool burnPosition)
+  function createAndBuy(CreateParams memory p, address expected, uint256 amount)
     external
     payable
     returns (address token, uint256 received, uint256 swapped);
+
+  /// @notice Gets the pool fee
+  /// @return poolFee The pool fee
+  function POOL_FEE() external view returns (uint16 poolFee);
+
+  /// @notice Gets the adapter
+  /// @return adapter The adapter
+  function adapter() external view returns (ICLMMAdapter adapter);
 
   /// @notice Gets the total number of tokens launched
   /// @return totalTokens The total count of launched tokens
@@ -172,15 +127,6 @@ interface ITokenLaunchpad {
   /// @notice Claims accumulated fees for a specific token
   /// @param _token The token to claim fees for
   function claimFees(IERC20 _token) external;
-
-  /// @notice Toggle an adapter
-  /// @param _adapter The adapter address
-  function toggleAdapter(ICLMMAdapter _adapter) external;
-
-  /// @notice Gets the launch parameters for a token
-  /// @param _token The token to get the launch parameters for
-  /// @return params The launch parameters for the token
-  function getTokenLaunchParams(IERC20 _token) external view returns (CreateParams memory params);
 
   /// @notice Gets the claimed fees for a token
   /// @param _token The token to get the claimed fees for

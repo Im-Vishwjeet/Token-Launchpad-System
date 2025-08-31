@@ -25,14 +25,15 @@ import {IERC20, SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeE
 import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 
 import {TickMath} from "@uniswap/v4-core/src/libraries/TickMath.sol";
-import {IWETH9} from "@uniswap/v4-periphery/src/interfaces/external/IWETH9.sol";
 import {ICLMMAdapter, IClPool} from "contracts/interfaces/ICLMMAdapter.sol";
 
 import {ITokenLaunchpad} from "contracts/interfaces/ITokenLaunchpad.sol";
 import {ICLSwapRouter} from "contracts/interfaces/thirdparty/ICLSwapRouter.sol";
 import {IClPoolFactory} from "contracts/interfaces/thirdparty/IClPoolFactory.sol";
 
-abstract contract BaseV3Adapter is ICLMMAdapter {
+import {Initializable} from "@openzeppelin/contracts/proxy/utils/Initializable.sol";
+
+abstract contract BaseV3Adapter is ICLMMAdapter, Initializable {
   using SafeERC20 for IERC20;
 
   address internal _me;
@@ -41,14 +42,12 @@ abstract contract BaseV3Adapter is ICLMMAdapter {
   ICLSwapRouter public swapRouter;
   address public locker;
   IERC721 public nftPositionManager;
-  IWETH9 public WETH9;
 
   mapping(IERC20 token => mapping(uint256 index => uint256 lockId)) public tokenToLockId;
   mapping(IERC20 token => mapping(uint256 index => uint256 claimedFees)) public tokenToClaimedFees;
 
   function __BaseV3Adapter_init(
     address _launchpad,
-    address _WETH9,
     address _locker,
     address _swapRouter,
     address _nftPositionManager,
@@ -61,7 +60,6 @@ abstract contract BaseV3Adapter is ICLMMAdapter {
     locker = _locker;
     nftPositionManager = IERC721(_nftPositionManager);
     swapRouter = ICLSwapRouter(_swapRouter);
-    WETH9 = IWETH9(_WETH9);
 
     nftPositionManager.setApprovalForAll(address(locker), true);
   }
@@ -120,34 +118,19 @@ abstract contract BaseV3Adapter is ICLMMAdapter {
 
     IClPool pool = _createPool(_params.tokenBase, _params.tokenQuote, _params.fee, sqrtPriceX96Launch);
 
-    if (!_params.burnPosition) {
-      // calculate and add liquidity for the various tick ranges
-      _mintAndLock(
-        _params.tokenBase, _params.tokenQuote, _params.tick0, _params.tick1, _params.fee, _params.graduationAmount, 0
-      );
+    uint256 tokenId0 =
+      _mint(_params.tokenBase, _params.tokenQuote, _params.tick0, _params.tick1, _params.fee, _params.graduationAmount);
+    uint256 tokenId1 = _mint(
+      _params.tokenBase,
+      _params.tokenQuote,
+      _params.tick1,
+      _params.tick2,
+      _params.fee,
+      _params.totalAmount - _params.graduationAmount
+    );
 
-      _mintAndLock(
-        _params.tokenBase,
-        _params.tokenQuote,
-        _params.tick1,
-        _params.tick2,
-        _params.fee,
-        _params.totalAmount - _params.graduationAmount,
-        1
-      );
-    } else {
-      _mintAndBurn(
-        _params.tokenBase, _params.tokenQuote, _params.tick0, _params.tick1, _params.fee, _params.graduationAmount
-      );
-      _mintAndBurn(
-        _params.tokenBase,
-        _params.tokenQuote,
-        _params.tick1,
-        _params.tick2,
-        _params.fee,
-        _params.totalAmount - _params.graduationAmount
-      );
-    }
+    tokenToLockId[IERC20(_params.tokenBase)][0] = tokenId0;
+    tokenToLockId[IERC20(_params.tokenBase)][1] = tokenId1;
 
     return address(pool);
   }
@@ -168,7 +151,7 @@ abstract contract BaseV3Adapter is ICLMMAdapter {
     tokenToClaimedFees[IERC20(_token)][0] += fee0;
     tokenToClaimedFees[IERC20(_token)][1] += fee1;
 
-    IERC20 quoteToken = ITokenLaunchpad(launchpad).getQuoteToken(IERC20(_token));
+    IERC20 quoteToken = ITokenLaunchpad(launchpad).fundingToken();
     IERC20(_token).transfer(msg.sender, fee0);
     quoteToken.transfer(msg.sender, fee1);
   }
@@ -193,28 +176,10 @@ abstract contract BaseV3Adapter is ICLMMAdapter {
   /// @param _tick1 The upper tick of the position
   /// @param _fee The fee of the pool
   /// @param _amount0 The amount of tokens to mint the position for
-  /// @param _index The index of the position
-  /// @return lockId The lock id of the position
-  function _mintAndLock(
-    IERC20 _token0,
-    IERC20 _token1,
-    int24 _tick0,
-    int24 _tick1,
-    uint24 _fee,
-    uint256 _amount0,
-    uint256 _index
-  ) internal virtual returns (uint256 lockId);
-
-  /// @dev Mint a position and lock it forever
-  /// @param _token0 The token to mint the position for
-  /// @param _token1 The token to mint the position for
-  /// @param _tick0 The lower tick of the position
-  /// @param _tick1 The upper tick of the position
-  /// @param _fee The fee of the pool
-  /// @param _amount0 The amount of tokens to mint the position for
-  function _mintAndBurn(IERC20 _token0, IERC20 _token1, int24 _tick0, int24 _tick1, uint24 _fee, uint256 _amount0)
+  function _mint(IERC20 _token0, IERC20 _token1, int24 _tick0, int24 _tick1, uint24 _fee, uint256 _amount0)
     internal
-    virtual;
+    virtual
+    returns (uint256 tokenId);
 
   function _collectFees(uint256 _lockId) internal virtual returns (uint256 fee0, uint256 fee1);
 

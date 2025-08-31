@@ -62,8 +62,8 @@ contract Swapper {
     if (msg.value > 0) weth.deposit{value: msg.value}();
     else _odosTokenIn.safeTransferFrom(msg.sender, address(this), _odosTokenInAmount);
 
-    uint24 fee = launchpad.getTokenFee(_tokenOut);
-    ICLMMAdapter adapter = launchpad.getTokenAdapter(_tokenOut);
+    uint24 fee = launchpad.POOL_FEE();
+    ICLMMAdapter adapter = launchpad.adapter();
 
     // call the odos contract to get the amount of tokens to buy
     if (_odosData.length > 10) {
@@ -107,8 +107,8 @@ contract Swapper {
     uint256 _minAmountOut,
     bytes memory _odosData
   ) public payable returns (uint256 amountOut) {
-    ICLMMAdapter adapter = launchpad.getTokenAdapter(_tokenIn);
-    uint24 fee = launchpad.getTokenFee(_tokenIn);
+    ICLMMAdapter adapter = launchpad.adapter();
+    uint24 fee = launchpad.POOL_FEE();
 
     _tokenIn.safeTransferFrom(msg.sender, address(this), _tokenInAmount);
     _tokenIn.approve(address(adapter), type(uint256).max);
