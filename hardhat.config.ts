@@ -74,7 +74,7 @@ const config: HardhatUserConfig = {
     deployer: 0,
   },
   etherscan: {
-    apiKey: "test",
+    apiKey: "I3S8B2G75PI7KKWFQJ5MVTH6IEZ13G9TVE",
     customChains: [
       {
         network: "xlayer",
