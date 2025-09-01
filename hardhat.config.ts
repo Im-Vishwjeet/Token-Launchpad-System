@@ -4,6 +4,7 @@ import "@nomicfoundation/hardhat-foundry";
 import "hardhat-deploy";
 import "@typechain/hardhat";
 import "hardhat-abi-exporter";
+import "hardhat-dependency-compiler";
 
 import dotenv from "dotenv";
 import { ethers } from "ethers";
@@ -21,7 +22,7 @@ const defaultAccount = {
 
 const _network = (url: string, gasPrice: number | "auto" = "auto") => ({
   url,
-  accounts: [process.env.PRIVATE_KEY || ethers.id("test")],
+  accounts: defaultAccount,
   saveDeployments: true,
   gasPrice,
 });
@@ -47,6 +48,9 @@ const config: HardhatUserConfig = {
   typechain: {
     outDir: "types",
     target: "ethers-v6",
+  },
+  dependencyCompiler: {
+    paths: ["@openzeppelin/contracts/proxy/transparent/ProxyAdmin.sol"],
   },
   networks: {
     hardhat: {

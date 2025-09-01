@@ -91,7 +91,6 @@ abstract contract TokenLaunchpad is ITokenLaunchpad, OwnableUpgradeable, ERC721E
     fundingToken.approve(address(adapter), type(uint256).max);
 
     // buy 1 token to register the token on tools like dexscreener
-    fundingToken.transferFrom(msg.sender, address(this), 1 ether);
     uint256 swapped = adapter.swapWithExactInput(fundingToken, token, 1 ether, 0);
 
     // if the user wants to buy more tokens, they can do so
@@ -103,7 +102,6 @@ abstract contract TokenLaunchpad is ITokenLaunchpad, OwnableUpgradeable, ERC721E
 
     // refund any remaining tokens
     _refundTokens(token);
-    _refundTokens(fundingToken);
 
     return (address(token), received, swapped, tokenToNftId[token]);
   }
