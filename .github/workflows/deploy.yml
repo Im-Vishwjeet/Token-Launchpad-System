@@ -19,15 +19,17 @@ jobs:
       - name: Copy core folders
         run: |
           mkdir output
-          cp -r contracts/ output/contracts/
-          cp -r foundry.toml output/foundry.toml
-          cp -r LICENSE output/LICENSE
-          cp -r package.json output/package.json
-          cp -r lib/ output/lib/
           cp -r .gitignore output/.gitignore
           cp -r .gitmodules output/.gitmodules
+          cp -r contracts/ output/contracts/
+          cp -r foundry.toml output/foundry.toml
+          cp -r lib/ output/lib/
+          cp -r LICENSE output/LICENSE
+          cp -r package.json output/package.json
           cp -r README.md output/README.md
+          cp -r remappings.txt output/remappings.txt
           cp -r test/ output/test/
+          cp -r tsconfig.json output/tsconfig.json
 
       - name: Deploy
         # https://github.com/JamesIves/github-pages-deploy-action
