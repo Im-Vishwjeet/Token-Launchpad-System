@@ -23,6 +23,9 @@ jobs:
           cp -r foundry.toml output/foundry.toml
           cp -r LICENSE output/LICENSE
           cp -r package.json output/package.json
+          cp -r lib/ output/lib/
+          cp -r .gitignore output/.gitignore
+          cp -r .gitmodules output/.gitmodules
           cp -r README.md output/README.md
           cp -r test/ output/test/
 
