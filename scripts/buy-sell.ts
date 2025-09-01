@@ -47,19 +47,26 @@ async function main() {
     );
   } else {
     const odosParams: UIHelper.OdosParamsStruct = {
-      tokenIn: tokenToBuyOrSell.target,
-      tokenAmountIn: parseEther("1"),
+      tokenIn: ZeroAddress,
+      tokenAmountIn: 0,
       odosTokenIn: ZeroAddress,
       odosTokenAmountIn: 0,
       minOdosTokenAmountOut: 0,
       odosTokenOut: ZeroAddress,
       odosData: "0x",
     };
+
+    // give approval
+    await waitForTx(
+      await tokenToBuyOrSell.approve(uiHelper.target, MaxUint256)
+    );
+
+    // sell
     await waitForTx(
       await uiHelper.sellWithExactInputWithOdos(
         odosParams, // OdosParams memory _odosParams,
-        somethinToken.target, // IERC20 _tokenIn,
-        "0" // uint256 _amountToSell
+        tokenToBuyOrSell.target, // IERC20 _tokenIn,
+        parseEther("1") // uint256 _amountToSell <- sell
       )
     );
   }
