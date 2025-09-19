@@ -361,30 +361,30 @@ contract SomeTimelockTest is Test {
     timelock.execute(address(target), 0, data, bytes32(0), bytes32(0));
   }
 
-    function test_update_delay() public {
-        uint256 newDelay = 7200; // 2 hours
-        
-        // Only the timelock contract itself can update delay (self-administration)
-        // This would typically be done through a timelocked operation
-        vm.prank(address(timelock));
-        timelock.updateDelay(newDelay);
-        
-        assertEq(timelock.getMinDelay(), newDelay);
-    }
+  function test_update_delay() public {
+    uint256 newDelay = 7200; // 2 hours
 
-    function test_only_timelock_can_update_delay() public {
-        uint256 newDelay = 7200;
-        
-        // Only the timelock contract itself can update delay
-        vm.prank(proposer1);
-        vm.expectRevert();
-        timelock.updateDelay(newDelay);
-        
-        // Admin also cannot update delay directly
-        vm.prank(admin);
-        vm.expectRevert();
-        timelock.updateDelay(newDelay);
-    }
+    // Only the timelock contract itself can update delay (self-administration)
+    // This would typically be done through a timelocked operation
+    vm.prank(address(timelock));
+    timelock.updateDelay(newDelay);
+
+    assertEq(timelock.getMinDelay(), newDelay);
+  }
+
+  function test_only_timelock_can_update_delay() public {
+    uint256 newDelay = 7200;
+
+    // Only the timelock contract itself can update delay
+    vm.prank(proposer1);
+    vm.expectRevert();
+    timelock.updateDelay(newDelay);
+
+    // Admin also cannot update delay directly
+    vm.prank(admin);
+    vm.expectRevert();
+    timelock.updateDelay(newDelay);
+  }
 
   function test_grant_role() public {
     // Admin can grant roles
