@@ -328,10 +328,7 @@ contract SomeProxyTest is Test {
   function test_upgrade_without_eth() public {
     // Test upgrade without ETH (standard case)
     vm.prank(admin);
-    ISomeProxy(address(proxy)).upgradeToAndCall(
-      address(implementationV2),
-      ""
-    );
+    ISomeProxy(address(proxy)).upgradeToAndCall(address(implementationV2), "");
 
     assertEq(proxy.implementation(), address(implementationV2));
   }
