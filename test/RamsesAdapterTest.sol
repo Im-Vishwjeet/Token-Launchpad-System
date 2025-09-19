@@ -344,16 +344,16 @@ contract RamsesAdapterTest is Test {
     fundingToken.mint(user1, 10_000 * 1e18);
     fundingToken.mint(user2, 10_000 * 1e18);
 
-        // Fund the launchpad with tokens (the adapter will transfer from launchpad during mint)
-        // Need enough tokens for GRADUATION_AMOUNT (600M) + POST_GRADUATION_AMOUNT (400M) = 1B tokens
-        vm.prank(address(launchpad));
-        token0.mint(address(launchpad), 2_000_000_000 * 1e18); // 2B tokens
-        vm.prank(address(launchpad));
-        token1.mint(address(launchpad), 2_000_000_000 * 1e18); // 2B tokens for multiple token scenarios
-        vm.prank(address(launchpad));
-        token0.approve(address(adapter), type(uint256).max);
-        vm.prank(address(launchpad));
-        token1.approve(address(adapter), type(uint256).max);
+    // Fund the launchpad with tokens (the adapter will transfer from launchpad during mint)
+    // Need enough tokens for GRADUATION_AMOUNT (600M) + POST_GRADUATION_AMOUNT (400M) = 1B tokens
+    vm.prank(address(launchpad));
+    token0.mint(address(launchpad), 2_000_000_000 * 1e18); // 2B tokens
+    vm.prank(address(launchpad));
+    token1.mint(address(launchpad), 2_000_000_000 * 1e18); // 2B tokens for multiple token scenarios
+    vm.prank(address(launchpad));
+    token0.approve(address(adapter), type(uint256).max);
+    vm.prank(address(launchpad));
+    token1.approve(address(adapter), type(uint256).max);
 
     // Fund the adapter with tokens for liquidity provision
     token0.mint(address(adapter), 1_000_000 * 1e18);
@@ -368,14 +368,14 @@ contract RamsesAdapterTest is Test {
     vm.label(address(nftPositionManager), "nftPositionManager");
     vm.label(address(poolFactory), "poolFactory");
     vm.label(address(swapRouter), "swapRouter");
-    vm.label(launchpad, "launchpad");
+    vm.label(address(launchpad), "launchpad");
     vm.label(owner, "owner");
     vm.label(user1, "user1");
     vm.label(user2, "user2");
   }
 
   function test_initialization() public {
-    assertEq(adapter.launchpad(), launchpad);
+    assertEq(adapter.launchpad(), address(launchpad));
     assertEq(address(adapter.swapRouter()), address(swapRouter));
     assertEq(address(adapter.nftPositionManager()), address(nftPositionManager));
     assertEq(address(adapter.clPoolFactory()), address(poolFactory));
@@ -397,7 +397,7 @@ contract RamsesAdapterTest is Test {
     nftPositionManager.setMockMintResult(1, 1000, 600_000_000 * 1e18, 0);
     nftPositionManager.setMockMintResult(2, 2000, 400_000_000 * 1e18, 0);
 
-    vm.prank(launchpad);
+    vm.prank(address(launchpad));
     address pool = adapter.addSingleSidedLiquidity(params);
 
     // Verify pool was created
@@ -440,17 +440,17 @@ contract RamsesAdapterTest is Test {
     nftPositionManager.setMockMintResult(1, 1000, 600_000_000 * 1e18, 0);
     nftPositionManager.setMockMintResult(2, 2000, 400_000_000 * 1e18, 0);
 
-    vm.prank(launchpad);
+    vm.prank(address(launchpad));
     adapter.addSingleSidedLiquidity(params);
 
     // Set mock fees
     nftPositionManager.setMockFees(1, 100 * 1e18, 200 * 1e18);
     nftPositionManager.setMockFees(2, 150 * 1e18, 250 * 1e18);
 
-    uint256 initialToken0Balance = token0.balanceOf(launchpad);
-    uint256 initialFundingBalance = fundingToken.balanceOf(launchpad);
+    uint256 initialToken0Balance = token0.balanceOf(address(launchpad));
+    uint256 initialFundingBalance = fundingToken.balanceOf(address(launchpad));
 
-    vm.prank(launchpad);
+    vm.prank(address(launchpad));
     (uint256 fee0, uint256 fee1) = adapter.claimFees(address(token0));
 
     // Verify fees were claimed
@@ -458,8 +458,8 @@ contract RamsesAdapterTest is Test {
     assertEq(fee1, 450 * 1e18); // 200 + 250
 
     // Verify tokens were transferred to launchpad
-    assertEq(token0.balanceOf(launchpad), initialToken0Balance + 250 * 1e18);
-    assertEq(fundingToken.balanceOf(launchpad), initialFundingBalance + 450 * 1e18);
+    assertEq(token0.balanceOf(address(launchpad)), initialToken0Balance + 250 * 1e18);
+    assertEq(fundingToken.balanceOf(address(launchpad)), initialFundingBalance + 450 * 1e18);
 
     // Verify claimed fees were recorded
     (uint256 claimedFee0, uint256 claimedFee1) = adapter.claimedFees(address(token0));
@@ -550,14 +550,14 @@ contract RamsesAdapterTest is Test {
     nftPositionManager.setMockMintResult(1, 1000, 600_000_000 * 1e18, 0);
     nftPositionManager.setMockMintResult(2, 2000, 400_000_000 * 1e18, 0);
 
-    vm.prank(launchpad);
+    vm.prank(address(launchpad));
     address pool1 = adapter.addSingleSidedLiquidity(params1);
 
     // Set mock mint results for second token
     nftPositionManager.setMockMintResult(3, 1500, 600_000_000 * 1e18, 0);
     nftPositionManager.setMockMintResult(4, 2500, 400_000_000 * 1e18, 0);
 
-    vm.prank(launchpad);
+    vm.prank(address(launchpad));
     address pool2 = adapter.addSingleSidedLiquidity(params2);
 
     // Verify both pools were created
@@ -596,10 +596,10 @@ contract RamsesAdapterTest is Test {
     nftPositionManager.setMockMintResult(3, 1500, 600_000_000 * 1e18, 0);
     nftPositionManager.setMockMintResult(4, 2500, 400_000_000 * 1e18, 0);
 
-    vm.prank(launchpad);
+    vm.prank(address(launchpad));
     adapter.addSingleSidedLiquidity(params1);
 
-    vm.prank(launchpad);
+    vm.prank(address(launchpad));
     adapter.addSingleSidedLiquidity(params2);
 
     // Set different fees for each position
@@ -609,11 +609,11 @@ contract RamsesAdapterTest is Test {
     nftPositionManager.setMockFees(4, 350 * 1e18, 450 * 1e18);
 
     // Claim fees for token0
-    vm.prank(launchpad);
+    vm.prank(address(launchpad));
     (uint256 fee0_0, uint256 fee1_0) = adapter.claimFees(address(token0));
 
     // Claim fees for token1
-    vm.prank(launchpad);
+    vm.prank(address(launchpad));
     (uint256 fee0_1, uint256 fee1_1) = adapter.claimFees(address(token1));
 
     // Verify fees for token0
@@ -665,7 +665,7 @@ contract RamsesAdapterTest is Test {
     nftPositionManager.setMockMintResult(1, 1000, 600_000_000 * 1e18, 0);
     nftPositionManager.setMockMintResult(2, 2000, 400_000_000 * 1e18, 0);
 
-    vm.prank(launchpad);
+    vm.prank(address(launchpad));
     address pool = adapter.addSingleSidedLiquidity(params);
 
     assertTrue(pool != address(0));
@@ -681,7 +681,7 @@ contract RamsesAdapterTest is Test {
     nftPositionManager.setMockMintResult(1, 0, 0, 0);
     nftPositionManager.setMockMintResult(2, 0, 0, 0);
 
-    vm.prank(launchpad);
+    vm.prank(address(launchpad));
     address pool = adapter.addSingleSidedLiquidity(params);
 
     assertTrue(pool != address(0));
@@ -700,7 +700,7 @@ contract RamsesAdapterTest is Test {
     nftPositionManager.setMockMintResult(1, 1000, 600_000_000 * 1e18, 0);
     nftPositionManager.setMockMintResult(2, 2000, 400_000_000 * 1e18, 0);
 
-    vm.prank(launchpad);
+    vm.prank(address(launchpad));
     address pool = adapter.addSingleSidedLiquidity(params);
 
     assertTrue(pool != address(0));
@@ -719,7 +719,7 @@ contract RamsesAdapterTest is Test {
     nftPositionManager.setMockMintResult(1, 1000, 600_000_000 * 1e18, 0);
     nftPositionManager.setMockMintResult(2, 2000, 400_000_000 * 1e18, 0);
 
-    vm.prank(launchpad);
+    vm.prank(address(launchpad));
     adapter.addSingleSidedLiquidity(params);
 
     // Initially no fees claimed
@@ -731,7 +731,7 @@ contract RamsesAdapterTest is Test {
     nftPositionManager.setMockFees(1, 100 * 1e18, 200 * 1e18);
     nftPositionManager.setMockFees(2, 150 * 1e18, 250 * 1e18);
 
-    vm.prank(launchpad);
+    vm.prank(address(launchpad));
     adapter.claimFees(address(token0));
 
     // Check claimed fees
