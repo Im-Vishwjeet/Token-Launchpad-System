@@ -121,42 +121,19 @@ contract SomeTokenTest is Test {
         assertEq(token.allowance(owner, user1), approveAmount);
     }
 
-    function test_increaseAllowance() public {
+    function test_approve_updates() public {
         uint256 initialAmount = 500 * 1e18;
-        uint256 increaseAmount = 300 * 1e18;
+        uint256 newAmount = 800 * 1e18;
 
+        // Initial approval
         vm.prank(owner);
         token.approve(user1, initialAmount);
+        assertEq(token.allowance(owner, user1), initialAmount);
 
+        // Update approval
         vm.prank(owner);
-        token.increaseAllowance(user1, increaseAmount);
-
-        assertEq(token.allowance(owner, user1), initialAmount + increaseAmount);
-    }
-
-    function test_decreaseAllowance() public {
-        uint256 initialAmount = 1000 * 1e18;
-        uint256 decreaseAmount = 300 * 1e18;
-
-        vm.prank(owner);
-        token.approve(user1, initialAmount);
-
-        vm.prank(owner);
-        token.decreaseAllowance(user1, decreaseAmount);
-
-        assertEq(token.allowance(owner, user1), initialAmount - decreaseAmount);
-    }
-
-    function test_decreaseAllowance_underflow() public {
-        uint256 initialAmount = 1000 * 1e18;
-        uint256 decreaseAmount = 1001 * 1e18; // More than allowance
-
-        vm.prank(owner);
-        token.approve(user1, initialAmount);
-
-        vm.prank(owner);
-        vm.expectRevert();
-        token.decreaseAllowance(user1, decreaseAmount);
+        token.approve(user1, newAmount);
+        assertEq(token.allowance(owner, user1), newAmount);
     }
 
     function test_transfer_to_zero_address() public {
