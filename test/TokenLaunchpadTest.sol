@@ -8,8 +8,8 @@ import {ICLMMAdapter} from "contracts/interfaces/ICLMMAdapter.sol";
 import {ITokenLaunchpad} from "contracts/interfaces/ITokenLaunchpad.sol";
 import {TokenLaunchpad} from "contracts/launchpad/TokenLaunchpad.sol";
 
-import {MockERC20} from "contracts/mocks/MockERC20.sol";
 import {Test} from "lib/forge-std/src/Test.sol";
+import {MockERC20} from "test/mocks/MockERC20.sol";
 
 import "forge-std/console.sol";
 
