@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity 0.8.26;
+pragma solidity ^0.8.0;
 
 import {IAccessControlEnumerable} from "@openzeppelin/contracts/access/extensions/IAccessControlEnumerable.sol";
 import {IERC165} from "@openzeppelin/contracts/utils/introspection/IERC165.sol";
@@ -146,10 +146,10 @@ contract SomeTimelockTest is Test {
     bytes memory data = abi.encodeWithSelector(MockTarget.setValue.selector, newValue);
 
     // Schedule the call
-        vm.startPrank(proposer1);
-        bytes32 operationId = timelock.hashOperation(address(target), 0, data, bytes32(0), bytes32(0));
-        timelock.schedule(address(target), 0, data, bytes32(0), bytes32(0), MIN_DELAY);
-        vm.stopPrank();
+    vm.startPrank(proposer1);
+    bytes32 operationId = timelock.hashOperation(address(target), 0, data, bytes32(0), bytes32(0));
+    timelock.schedule(address(target), 0, data, bytes32(0), bytes32(0), MIN_DELAY);
+    vm.stopPrank();
 
     // Verify the operation is scheduled
     assertTrue(timelock.isOperation(operationId));
@@ -164,9 +164,9 @@ contract SomeTimelockTest is Test {
     assertTrue(timelock.isOperationReady(operationId));
 
     // Execute the call
-        vm.startPrank(proposer1);
-        timelock.execute(address(target), 0, data, bytes32(0), bytes32(0));
-        vm.stopPrank();
+    vm.startPrank(proposer1);
+    timelock.execute(address(target), 0, data, bytes32(0), bytes32(0));
+    vm.stopPrank();
 
     // Verify execution
     assertTrue(timelock.isOperationDone(operationId));
@@ -181,9 +181,10 @@ contract SomeTimelockTest is Test {
     vm.deal(address(timelock), ethAmount);
 
     // Schedule the call
-    vm.prank(proposer1);
+    vm.startPrank(proposer1);
     bytes32 operationId = timelock.hashOperation(address(target), ethAmount, data, bytes32(0), bytes32(0));
     timelock.schedule(address(target), ethAmount, data, bytes32(0), bytes32(0), MIN_DELAY);
+    vm.stopPrank();
 
     // Fast forward time
     vm.warp(block.timestamp + MIN_DELAY + 1);
@@ -191,8 +192,9 @@ contract SomeTimelockTest is Test {
     uint256 initialBalance = address(target).balance;
 
     // Execute the call
-    vm.prank(proposer1);
+    vm.startPrank(proposer1);
     timelock.execute(address(target), ethAmount, data, bytes32(0), bytes32(0));
+    vm.stopPrank();
 
     // Verify ETH was transferred
     assertEq(address(target).balance, initialBalance + ethAmount);
@@ -202,10 +204,10 @@ contract SomeTimelockTest is Test {
     bytes memory data = abi.encodeWithSelector(MockTarget.setValue.selector, uint256(123));
 
     // Schedule the call
-        vm.startPrank(proposer1);
-        bytes32 operationId = timelock.hashOperation(address(target), 0, data, bytes32(0), bytes32(0));
-        timelock.schedule(address(target), 0, data, bytes32(0), bytes32(0), MIN_DELAY);
-        vm.stopPrank();
+    vm.startPrank(proposer1);
+    bytes32 operationId = timelock.hashOperation(address(target), 0, data, bytes32(0), bytes32(0));
+    timelock.schedule(address(target), 0, data, bytes32(0), bytes32(0), MIN_DELAY);
+    vm.stopPrank();
 
     // Verify operation is scheduled
     assertTrue(timelock.isOperationPending(operationId));
@@ -231,10 +233,10 @@ contract SomeTimelockTest is Test {
     payloads[1] = abi.encodeWithSelector(MockTarget.setValue.selector, uint256(200));
 
     // Schedule batch
-        vm.startPrank(proposer1);
-        bytes32 operationId = timelock.hashOperationBatch(targets, values, payloads, bytes32(0), bytes32(0));
-        timelock.scheduleBatch(targets, values, payloads, bytes32(0), bytes32(0), MIN_DELAY);
-        vm.stopPrank();
+    vm.startPrank(proposer1);
+    bytes32 operationId = timelock.hashOperationBatch(targets, values, payloads, bytes32(0), bytes32(0));
+    timelock.scheduleBatch(targets, values, payloads, bytes32(0), bytes32(0), MIN_DELAY);
+    vm.stopPrank();
 
     // Verify batch is scheduled
     assertTrue(timelock.isOperationPending(operationId));
@@ -255,17 +257,17 @@ contract SomeTimelockTest is Test {
     bytes memory data1 = abi.encodeWithSelector(MockTarget.setValue.selector, uint256(10));
     bytes memory data2 = abi.encodeWithSelector(MockTarget.setValue.selector, uint256(20));
 
-        // Schedule first operation
-        vm.startPrank(proposer1);
-        bytes32 operation1 = timelock.hashOperation(address(target), 0, data1, bytes32(0), bytes32(0));
-        timelock.schedule(address(target), 0, data1, bytes32(0), bytes32(0), MIN_DELAY);
-        vm.stopPrank();
-        
-        // Schedule second operation with first as predecessor
-        vm.startPrank(proposer1);
-        bytes32 operation2 = timelock.hashOperation(address(target), 0, data2, operation1, bytes32(0));
-        timelock.schedule(address(target), 0, data2, operation1, bytes32(0), MIN_DELAY);
-        vm.stopPrank();
+    // Schedule first operation
+    vm.startPrank(proposer1);
+    bytes32 operation1 = timelock.hashOperation(address(target), 0, data1, bytes32(0), bytes32(0));
+    timelock.schedule(address(target), 0, data1, bytes32(0), bytes32(0), MIN_DELAY);
+    vm.stopPrank();
+
+    // Schedule second operation with first as predecessor
+    vm.startPrank(proposer1);
+    bytes32 operation2 = timelock.hashOperation(address(target), 0, data2, operation1, bytes32(0));
+    timelock.schedule(address(target), 0, data2, operation1, bytes32(0), MIN_DELAY);
+    vm.stopPrank();
 
     // Fast forward time
     vm.warp(block.timestamp + MIN_DELAY + 1);
@@ -319,10 +321,10 @@ contract SomeTimelockTest is Test {
     bytes memory data = abi.encodeWithSelector(MockTarget.setValue.selector, uint256(42));
 
     // Schedule operation
-        vm.startPrank(proposer1);
-        bytes32 operationId = timelock.hashOperation(address(target), 0, data, bytes32(0), bytes32(0));
-        timelock.schedule(address(target), 0, data, bytes32(0), bytes32(0), MIN_DELAY);
-        vm.stopPrank();
+    vm.startPrank(proposer1);
+    bytes32 operationId = timelock.hashOperation(address(target), 0, data, bytes32(0), bytes32(0));
+    timelock.schedule(address(target), 0, data, bytes32(0), bytes32(0), MIN_DELAY);
+    vm.stopPrank();
 
     // Non-canceller (admin) should not be able to cancel
     vm.prank(admin);
@@ -359,24 +361,30 @@ contract SomeTimelockTest is Test {
     timelock.execute(address(target), 0, data, bytes32(0), bytes32(0));
   }
 
-  function test_update_delay() public {
-    uint256 newDelay = 7200; // 2 hours
+    function test_update_delay() public {
+        uint256 newDelay = 7200; // 2 hours
+        
+        // Only the timelock contract itself can update delay (self-administration)
+        // This would typically be done through a timelocked operation
+        vm.prank(address(timelock));
+        timelock.updateDelay(newDelay);
+        
+        assertEq(timelock.getMinDelay(), newDelay);
+    }
 
-    // Only admin can update delay
-    vm.prank(admin);
-    timelock.updateDelay(newDelay);
-
-    assertEq(timelock.getMinDelay(), newDelay);
-  }
-
-  function test_only_admin_can_update_delay() public {
-    uint256 newDelay = 7200;
-
-    // Non-admin should not be able to update delay
-    vm.prank(proposer1);
-    vm.expectRevert();
-    timelock.updateDelay(newDelay);
-  }
+    function test_only_timelock_can_update_delay() public {
+        uint256 newDelay = 7200;
+        
+        // Only the timelock contract itself can update delay
+        vm.prank(proposer1);
+        vm.expectRevert();
+        timelock.updateDelay(newDelay);
+        
+        // Admin also cannot update delay directly
+        vm.prank(admin);
+        vm.expectRevert();
+        timelock.updateDelay(newDelay);
+    }
 
   function test_grant_role() public {
     // Admin can grant roles
@@ -439,9 +447,9 @@ contract SomeTimelockTest is Test {
     vm.warp(block.timestamp + delay + 1);
 
     // Execute operation
-        vm.startPrank(proposer1);
-        timelock.execute(address(target), 0, data, bytes32(0), bytes32(0));
-        vm.stopPrank();
+    vm.startPrank(proposer1);
+    timelock.execute(address(target), 0, data, bytes32(0), bytes32(0));
+    vm.stopPrank();
 
     // Verify execution
     assertEq(target.value(), value);
@@ -476,16 +484,17 @@ contract SomeTimelockTest is Test {
       bytes memory data = abi.encodeWithSelector(MockTarget.setValue.selector, values[i]);
 
       // Schedule operation
-      vm.prank(proposer1);
+      vm.startPrank(proposer1);
       timelock.schedule(address(target), 0, data, bytes32(0), bytes32(0), MIN_DELAY);
+      vm.stopPrank();
 
       // Fast forward time
       vm.warp(block.timestamp + MIN_DELAY + 1);
 
       // Execute operation
-        vm.startPrank(proposer1);
-        timelock.execute(address(target), 0, data, bytes32(0), bytes32(0));
-        vm.stopPrank();
+      vm.startPrank(proposer1);
+      timelock.execute(address(target), 0, data, bytes32(0), bytes32(0));
+      vm.stopPrank();
 
       // Verify value is set
       assertEq(target.value(), values[i]);
@@ -499,9 +508,10 @@ contract SomeTimelockTest is Test {
     bytes32 hash1 = timelock.hashOperation(address(target), 0, data, bytes32(0), bytes32(0));
 
     // Schedule operation
-    vm.prank(proposer1);
+    vm.startPrank(proposer1);
     bytes32 hash2 = timelock.hashOperation(address(target), 0, data, bytes32(0), bytes32(0));
     timelock.schedule(address(target), 0, data, bytes32(0), bytes32(0), MIN_DELAY);
+    vm.stopPrank();
 
     // Hashes should be the same
     assertEq(hash1, hash2);
@@ -516,9 +526,9 @@ contract SomeTimelockTest is Test {
 
     vm.warp(block.timestamp + MIN_DELAY + 1);
 
-        vm.startPrank(proposer1);
-        timelock.execute(address(target), 0, data, bytes32(0), bytes32(0));
-        vm.stopPrank();
+    vm.startPrank(proposer1);
+    timelock.execute(address(target), 0, data, bytes32(0), bytes32(0));
+    vm.stopPrank();
 
     // Try to execute again (should fail)
     vm.prank(proposer1);
@@ -531,9 +541,9 @@ contract SomeTimelockTest is Test {
     bytes memory data = abi.encodeWithSelector(MockTarget.payableFunction.selector);
 
     // Schedule operation with ETH
-        vm.startPrank(proposer1);
-        timelock.schedule(address(target), ethAmount, data, bytes32(0), bytes32(0), MIN_DELAY);
-        vm.stopPrank();
+    vm.startPrank(proposer1);
+    timelock.schedule(address(target), ethAmount, data, bytes32(0), bytes32(0), MIN_DELAY);
+    vm.stopPrank();
 
     // Fast forward time
     vm.warp(block.timestamp + MIN_DELAY + 1);
