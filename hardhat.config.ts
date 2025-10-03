@@ -31,10 +31,10 @@ const config: HardhatUserConfig = {
   solidity: {
     version: "0.8.28",
     settings: {
-      viaIR: true,
+      viaIR: false,
       optimizer: {
         enabled: true,
-        runs: 200,
+        runs: 2000,
       },
     },
   },

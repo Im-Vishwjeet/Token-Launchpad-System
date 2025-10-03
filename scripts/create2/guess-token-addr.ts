@@ -1,48 +1,47 @@
-import { AbiCoder, Addressable, ethers, keccak256 } from "ethers";
+import { ethers } from "ethers";
+import { TokenLaunchpad__factory } from "../../types";
 
-export const guessTokenAddress = (
-  deployingAddress: string | Addressable,
-  implementationByteCode: string,
-  quoteTokenAddress: string | Addressable,
+export const guessTokenAddress = async (
+  launchpadAddress: string,
+  quoteTokenAddress: string,
   deployerAddress: string,
   name: string,
-  symbol: string
+  symbol: string,
+  provider: ethers.Provider
 ) => {
   let i = 0;
 
-  const abi = new AbiCoder();
+  // Create contract instance using deployed contract ABI
+  const launchpad = TokenLaunchpad__factory.connect(launchpadAddress, provider);
 
   while (true) {
     const salt = ethers.id("" + i + Date.now());
-    const saltHash = keccak256(
-      abi.encode(
-        ["bytes32", "address", "string", "string"],
-        [salt, deployerAddress, name, symbol]
-      )
-    );
+    
+    try {
+      // Use the launchpad's computeTokenAddress function to compute the address
+      const [computedAddress, isValid] = await launchpad.computeTokenAddress(
+        {
+          salt: salt,
+          name: name,
+          symbol: symbol,
+          metadata: ""
+        },
+        quoteTokenAddress,
+        deployerAddress
+      );
 
-    // Get the creation bytecode for WAGMIEToken
+      if (isValid) {
+        console.log("found the right salt hash");
+        console.log("salt", salt, computedAddress);
+        return { salt, computedAddress };
+      }
 
-    // Encode constructor parameters
-    const encodedParams = abi.encode(["string", "string"], [name, symbol]);
-
-    // Combine bytecode and encoded constructor params
-    const initCode = implementationByteCode + encodedParams.slice(2);
-
-    // Calculate CREATE2 address
-    const computedAddress = ethers.getCreate2Address(
-      deployingAddress as string,
-      saltHash,
-      keccak256(initCode)
-    );
-
-    if (computedAddress < quoteTokenAddress) {
-      console.log("found the right salt hash");
-      console.log("salt", salt, computedAddress);
-      return { salt, computedAddress };
+      if (i % 100000 == 0) console.log(i, "salt", salt, computedAddress);
+    } catch (error) {
+      console.error("Error calling computeTokenAddress:", error);
+      throw error;
     }
-
-    if (i % 100000 == 0) console.log(i, "salt", salt, computedAddress);
+    
     i++;
   }
 };
