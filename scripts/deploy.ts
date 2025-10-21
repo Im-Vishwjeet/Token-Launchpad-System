@@ -8,7 +8,7 @@ import hre from "hardhat";
 async function main() {
   const deployer = "0x8EfeFDBe3f3f7D48b103CD220d634CBF1d0Ae1a6";
   const wethAddressOnLinea = "0xe5d7c2a44ffddf6b295a15c148167daaaf5cf34f";
-  const odosAddressOnLinea = "0x2d8879046f1559E53eb052E949e9544bCB72f414";
+  const openoceanAddressOnLinea = "0x6352a56caadC4F1E25CD6c75970Fa768A3304e64";
 
   const currSomethingPrice = 0.001;
 
@@ -73,7 +73,7 @@ async function main() {
   const uiHelperD = await deployContract(
     hre,
     "UIHelper",
-    [wethAddressOnLinea, odosAddressOnLinea, launchpadD.address],
+    [wethAddressOnLinea, openoceanAddressOnLinea, launchpadD.address],
     "UIHelper"
   );
 
