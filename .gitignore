@@ -22,3 +22,5 @@ forge-build
 cache_hardhat
 
 lcov.info
+
+.DS_Store
