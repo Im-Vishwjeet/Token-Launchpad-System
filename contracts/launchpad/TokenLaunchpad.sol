@@ -20,8 +20,9 @@
 pragma solidity ^0.8.0;
 
 import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
-import {ERC721EnumerableUpgradeable} from
-  "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721EnumerableUpgradeable.sol";
+import {
+  ERC721EnumerableUpgradeable
+} from "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721EnumerableUpgradeable.sol";
 
 import {ReentrancyGuardUpgradeable} from "@openzeppelin/contracts-upgradeable/utils/ReentrancyGuardUpgradeable.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
@@ -110,11 +111,7 @@ abstract contract TokenLaunchpad is
       IERC20(address(token)).forceApprove(address(adapter), type(uint256).max);
       address pool = adapter.addSingleSidedLiquidity(
         ICLMMAdapter.AddLiquidityParams({
-          tokenBase: token,
-          tokenQuote: fundingToken,
-          tick0: launchTick,
-          tick1: graduationTick,
-          tick2: upperMaxTick
+          tokenBase: token, tokenQuote: fundingToken, tick0: launchTick, tick1: graduationTick, tick2: upperMaxTick
         })
       );
 

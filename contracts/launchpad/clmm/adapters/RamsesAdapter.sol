@@ -55,15 +55,17 @@ interface IRamsesPoolFactory {
   function createPool(IERC20 _token0, IERC20 _token1, int24 _tickSpacing, uint160 _sqrtPriceX96Launch)
     external
     returns (address pool);
-    
+
   function getPool(IERC20 _token0, IERC20 _token1, int24 _tickSpacing) external view returns (address pool);
 }
 
 contract RamsesAdapter is BaseV3Adapter {
   using SafeERC20 for IERC20;
+
   constructor() {
     _disableInitializers();
   }
+
   function initialize(address _launchpad, address _swapRouter, address _nftPositionManager, address _clPoolFactory)
     external
     initializer
@@ -96,15 +98,16 @@ contract RamsesAdapter is BaseV3Adapter {
     });
 
     (tokenId,,,) = INonfungiblePositionManagerRamses(address(nftPositionManager)).mint(params);
-    
+
     // Refund any unused tokens back to the caller
     _refundTokens(_token0, initialBalance);
   }
 
   function _collectFees(uint256 _nftId) internal override returns (uint256 fee0, uint256 fee1) {
-    (fee0, fee1) = INonfungiblePositionManagerRamses(address(nftPositionManager)).collect(
-      INonfungiblePositionManagerRamses.CollectParams(_nftId, address(this), type(uint128).max, type(uint128).max)
-    );
+    (fee0, fee1) = INonfungiblePositionManagerRamses(address(nftPositionManager))
+      .collect(
+        INonfungiblePositionManagerRamses.CollectParams(_nftId, address(this), type(uint128).max, type(uint128).max)
+      );
   }
 
   function _createPool(IERC20 _token0, IERC20 _token1, int24 _tickSpacing, uint160 _sqrtPriceX96Launch)
@@ -115,15 +118,16 @@ contract RamsesAdapter is BaseV3Adapter {
   {
     // Sort tokens to ensure canonical ordering (token0 < token1 by address)
     (IERC20 token0, IERC20 token1) = _sortTokens(_token0, _token1);
-    
+
     // Check if pool already exists
     address existingPool = IRamsesPoolFactory(address(clPoolFactory)).getPool(token0, token1, _tickSpacing);
     if (existingPool != address(0)) {
       revert("Pool already exists");
     }
-    
+
     // Create the pool with sorted tokens
-    address _pool = IRamsesPoolFactory(address(clPoolFactory)).createPool(token0, token1, _tickSpacing, _sqrtPriceX96Launch);
+    address _pool =
+      IRamsesPoolFactory(address(clPoolFactory)).createPool(token0, token1, _tickSpacing, _sqrtPriceX96Launch);
     pool = IClPool(_pool);
   }
 

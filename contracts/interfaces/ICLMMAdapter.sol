@@ -29,14 +29,14 @@ import {IClPool} from "contracts/interfaces/thirdparty/IClPool.sol";
 /// @dev Implements single-sided liquidity provision and fee claiming
 interface ICLMMAdapter {
   /// @notice Parameters for adding liquidity to a pool
-    struct AddLiquidityParams {
+  struct AddLiquidityParams {
     IERC20 tokenBase;
     IERC20 tokenQuote;
     int24 tick0;
     int24 tick1;
     int24 tick2;
   }
-  
+
   /// @notice Emitted when single-sided liquidity is added
   /// @param token The base token address
   /// @param pool The pool address
@@ -62,11 +62,7 @@ interface ICLMMAdapter {
   /// @param amountOut The amount of output tokens
   /// @param recipient The recipient address
   event SwapExecutedExactInput(
-    address indexed tokenIn,
-    address indexed tokenOut,
-    uint256 amountIn,
-    uint256 amountOut,
-    address indexed recipient
+    address indexed tokenIn, address indexed tokenOut, uint256 amountIn, uint256 amountOut, address indexed recipient
   );
 
   /// @notice Emitted when a swap with exact output is executed
@@ -76,11 +72,7 @@ interface ICLMMAdapter {
   /// @param amountOut The amount of output tokens
   /// @param recipient The recipient address
   event SwapExecutedExactOutput(
-    address indexed tokenIn,
-    address indexed tokenOut,
-    uint256 amountIn,
-    uint256 amountOut,
-    address indexed recipient
+    address indexed tokenIn, address indexed tokenOut, uint256 amountIn, uint256 amountOut, address indexed recipient
   );
 
   /// @notice Thrown when caller is not the launchpad contract

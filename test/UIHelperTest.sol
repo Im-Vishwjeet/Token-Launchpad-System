@@ -197,10 +197,7 @@ contract UIHelperTest is Test {
 
   function test_createAndBuy_withETH() public {
     ITokenLaunchpad.CreateParams memory params = ITokenLaunchpad.CreateParams({
-      salt: keccak256("test-salt"),
-      name: "Test Token",
-      symbol: "TEST",
-      metadata: "ipfs://test"
+      salt: keccak256("test-salt"), name: "Test Token", symbol: "TEST", metadata: "ipfs://test"
     });
 
     UIHelper.OdosParams memory odosParams = UIHelper.OdosParams({
@@ -226,10 +223,7 @@ contract UIHelperTest is Test {
 
   function test_createAndBuy_withToken() public {
     ITokenLaunchpad.CreateParams memory params = ITokenLaunchpad.CreateParams({
-      salt: keccak256("test-salt-2"),
-      name: "Test Token 2",
-      symbol: "TEST2",
-      metadata: "ipfs://test2"
+      salt: keccak256("test-salt-2"), name: "Test Token 2", symbol: "TEST2", metadata: "ipfs://test2"
     });
 
     UIHelper.OdosParams memory odosParams = UIHelper.OdosParams({
@@ -256,10 +250,7 @@ contract UIHelperTest is Test {
 
   function test_createAndBuy_withOdosSwap() public {
     ITokenLaunchpad.CreateParams memory params = ITokenLaunchpad.CreateParams({
-      salt: keccak256("test-salt-3"),
-      name: "Test Token 3",
-      symbol: "TEST3",
-      metadata: "ipfs://test3"
+      salt: keccak256("test-salt-3"), name: "Test Token 3", symbol: "TEST3", metadata: "ipfs://test3"
     });
 
     // Set up mock ODOS output
@@ -404,10 +395,7 @@ contract UIHelperTest is Test {
     vm.deal(address(uiHelper), 1 ether);
 
     ITokenLaunchpad.CreateParams memory params = ITokenLaunchpad.CreateParams({
-      salt: keccak256("test-salt-purge"),
-      name: "Purge Token",
-      symbol: "PURGE",
-      metadata: "ipfs://purge"
+      salt: keccak256("test-salt-purge"), name: "Purge Token", symbol: "PURGE", metadata: "ipfs://purge"
     });
 
     UIHelper.OdosParams memory odosParams = UIHelper.OdosParams({
@@ -436,10 +424,7 @@ contract UIHelperTest is Test {
     testToken.mint(address(uiHelper), 100 * 1e18);
 
     ITokenLaunchpad.CreateParams memory params = ITokenLaunchpad.CreateParams({
-      salt: keccak256("test-salt-purge-token"),
-      name: "Purge Token Test",
-      symbol: "PURGE2",
-      metadata: "ipfs://purge2"
+      salt: keccak256("test-salt-purge-token"), name: "Purge Token Test", symbol: "PURGE2", metadata: "ipfs://purge2"
     });
 
     UIHelper.OdosParams memory odosParams = UIHelper.OdosParams({
@@ -606,10 +591,7 @@ contract UIHelperTest is Test {
 
   function test_createAndBuy_withZeroAddress() public {
     ITokenLaunchpad.CreateParams memory params = ITokenLaunchpad.CreateParams({
-      salt: keccak256("test-salt-zero"),
-      name: "Zero Token",
-      symbol: "ZERO",
-      metadata: "ipfs://zero"
+      salt: keccak256("test-salt-zero"), name: "Zero Token", symbol: "ZERO", metadata: "ipfs://zero"
     });
 
     UIHelper.OdosParams memory odosParams = UIHelper.OdosParams({

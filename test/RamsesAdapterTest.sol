@@ -428,11 +428,7 @@ contract RamsesAdapterTest is Test {
 
   function test_addSingleSidedLiquidity() public {
     ICLMMAdapter.AddLiquidityParams memory params = ICLMMAdapter.AddLiquidityParams({
-      tokenBase: token0,
-      tokenQuote: fundingToken,
-      tick0: -1000,
-      tick1: 0,
-      tick2: 1000
+      tokenBase: token0, tokenQuote: fundingToken, tick0: -1000, tick1: 0, tick2: 1000
     });
 
     // Set mock mint results
@@ -456,11 +452,7 @@ contract RamsesAdapterTest is Test {
 
   function test_addSingleSidedLiquidity_noResidualTokens() public {
     ICLMMAdapter.AddLiquidityParams memory params = ICLMMAdapter.AddLiquidityParams({
-      tokenBase: token0,
-      tokenQuote: fundingToken,
-      tick0: -1000,
-      tick1: 0,
-      tick2: 1000
+      tokenBase: token0, tokenQuote: fundingToken, tick0: -1000, tick1: 0, tick2: 1000
     });
 
     // Set mock mint results that use less than the full amount
@@ -551,11 +543,7 @@ contract RamsesAdapterTest is Test {
 
   function test_createPool_duplicatePrevention() public {
     ICLMMAdapter.AddLiquidityParams memory params = ICLMMAdapter.AddLiquidityParams({
-      tokenBase: token0,
-      tokenQuote: fundingToken,
-      tick0: -1000,
-      tick1: 0,
-      tick2: 1000
+      tokenBase: token0, tokenQuote: fundingToken, tick0: -1000, tick1: 0, tick2: 1000
     });
 
     // First creation should succeed
@@ -572,11 +560,7 @@ contract RamsesAdapterTest is Test {
   function test_createPool_differentTickSpacing() public {
     // Create two pools with different tick spacing - should both succeed
     ICLMMAdapter.AddLiquidityParams memory params1 = ICLMMAdapter.AddLiquidityParams({
-      tokenBase: token0,
-      tokenQuote: fundingToken,
-      tick0: -1000,
-      tick1: 0,
-      tick2: 1000
+      tokenBase: token0, tokenQuote: fundingToken, tick0: -1000, tick1: 0, tick2: 1000
     });
 
     // First pool with default tick spacing (200)
@@ -645,11 +629,7 @@ contract RamsesAdapterTest is Test {
 
   function test_addSingleSidedLiquidity_onlyLaunchpad() public {
     ICLMMAdapter.AddLiquidityParams memory params = ICLMMAdapter.AddLiquidityParams({
-      tokenBase: token0,
-      tokenQuote: fundingToken,
-      tick0: -1000,
-      tick1: 0,
-      tick2: 1000
+      tokenBase: token0, tokenQuote: fundingToken, tick0: -1000, tick1: 0, tick2: 1000
     });
 
     // Try to call from non-launchpad address
@@ -661,11 +641,7 @@ contract RamsesAdapterTest is Test {
   function test_claimFees() public {
     // First add liquidity to create positions
     ICLMMAdapter.AddLiquidityParams memory params = ICLMMAdapter.AddLiquidityParams({
-      tokenBase: token0,
-      tokenQuote: fundingToken,
-      tick0: -1000,
-      tick1: 0,
-      tick2: 1000
+      tokenBase: token0, tokenQuote: fundingToken, tick0: -1000, tick1: 0, tick2: 1000
     });
 
     nftPositionManager.setMockMintResult(1, 1000, 600_000_000 * 1e18, 0);
@@ -707,19 +683,11 @@ contract RamsesAdapterTest is Test {
   function test_multiple_liquidity_provisions() public {
     // Add liquidity for multiple tokens
     ICLMMAdapter.AddLiquidityParams memory params1 = ICLMMAdapter.AddLiquidityParams({
-      tokenBase: token0,
-      tokenQuote: fundingToken,
-      tick0: -1000,
-      tick1: 0,
-      tick2: 1000
+      tokenBase: token0, tokenQuote: fundingToken, tick0: -1000, tick1: 0, tick2: 1000
     });
 
     ICLMMAdapter.AddLiquidityParams memory params2 = ICLMMAdapter.AddLiquidityParams({
-      tokenBase: token1,
-      tokenQuote: fundingToken,
-      tick0: -600,
-      tick1: 400,
-      tick2: 1400
+      tokenBase: token1, tokenQuote: fundingToken, tick0: -600, tick1: 400, tick2: 1400
     });
 
     // Set mock mint results for first token
@@ -751,19 +719,11 @@ contract RamsesAdapterTest is Test {
   function test_claimFees_multiple_positions() public {
     // Add liquidity for multiple tokens
     ICLMMAdapter.AddLiquidityParams memory params1 = ICLMMAdapter.AddLiquidityParams({
-      tokenBase: token0,
-      tokenQuote: fundingToken,
-      tick0: -1000,
-      tick1: 0,
-      tick2: 1000
+      tokenBase: token0, tokenQuote: fundingToken, tick0: -1000, tick1: 0, tick2: 1000
     });
 
     ICLMMAdapter.AddLiquidityParams memory params2 = ICLMMAdapter.AddLiquidityParams({
-      tokenBase: token1,
-      tokenQuote: fundingToken,
-      tick0: -600,
-      tick1: 400,
-      tick2: 1400
+      tokenBase: token1, tokenQuote: fundingToken, tick0: -600, tick1: 400, tick2: 1400
     });
 
     // Set mock mint results and add liquidity
@@ -844,11 +804,7 @@ contract RamsesAdapterTest is Test {
   function test_claimedFees_view_function() public {
     // Add liquidity first
     ICLMMAdapter.AddLiquidityParams memory params = ICLMMAdapter.AddLiquidityParams({
-      tokenBase: token0,
-      tokenQuote: fundingToken,
-      tick0: -1000,
-      tick1: 0,
-      tick2: 1000
+      tokenBase: token0, tokenQuote: fundingToken, tick0: -1000, tick1: 0, tick2: 1000
     });
 
     nftPositionManager.setMockMintResult(1, 1000, 600_000_000 * 1e18, 0);

@@ -203,10 +203,7 @@ contract TokenLaunchpadTest is Test {
 
   function test_createAndBuy_noAmount() public {
     ITokenLaunchpad.CreateParams memory params = ITokenLaunchpad.CreateParams({
-      salt: keccak256("test-salt"),
-      name: "Test Token",
-      symbol: "TEST",
-      metadata: "ipfs://test"
+      salt: keccak256("test-salt"), name: "Test Token", symbol: "TEST", metadata: "ipfs://test"
     });
 
     // Approve funding token for bootstrap amount (now required)
@@ -239,10 +236,7 @@ contract TokenLaunchpadTest is Test {
 
   function test_createAndBuy_withAmount() public {
     ITokenLaunchpad.CreateParams memory params = ITokenLaunchpad.CreateParams({
-      salt: keccak256("test-salt-2"),
-      name: "Test Token 2",
-      symbol: "TEST2",
-      metadata: "ipfs://test2"
+      salt: keccak256("test-salt-2"), name: "Test Token 2", symbol: "TEST2", metadata: "ipfs://test2"
     });
 
     uint256 buyAmount = 100 * 1e18;
@@ -280,10 +274,7 @@ contract TokenLaunchpadTest is Test {
 
   function test_createAndBuy_expectedAddress() public {
     ITokenLaunchpad.CreateParams memory params = ITokenLaunchpad.CreateParams({
-      salt: keccak256("test-salt-3"),
-      name: "Test Token 3",
-      symbol: "TEST3",
-      metadata: "ipfs://test3"
+      salt: keccak256("test-salt-3"), name: "Test Token 3", symbol: "TEST3", metadata: "ipfs://test3"
     });
 
     // Calculate expected address
@@ -314,10 +305,7 @@ contract TokenLaunchpadTest is Test {
 
   function test_createAndBuy_invalidExpectedAddress() public {
     ITokenLaunchpad.CreateParams memory params = ITokenLaunchpad.CreateParams({
-      salt: keccak256("test-salt-4"),
-      name: "Test Token 4",
-      symbol: "TEST4",
-      metadata: "ipfs://test4"
+      salt: keccak256("test-salt-4"), name: "Test Token 4", symbol: "TEST4", metadata: "ipfs://test4"
     });
 
     address wrongExpected = makeAddr("wrong");
@@ -333,10 +321,7 @@ contract TokenLaunchpadTest is Test {
   function test_claimFees() public {
     // First create a token
     ITokenLaunchpad.CreateParams memory params = ITokenLaunchpad.CreateParams({
-      salt: keccak256("test-salt-5"),
-      name: "Test Token 5",
-      symbol: "TEST5",
-      metadata: "ipfs://test5"
+      salt: keccak256("test-salt-5"), name: "Test Token 5", symbol: "TEST5", metadata: "ipfs://test5"
     });
 
     // Approve funding token for bootstrap amount
@@ -426,10 +411,7 @@ contract TokenLaunchpadTest is Test {
 
   function test_refundTokens() public {
     ITokenLaunchpad.CreateParams memory params = ITokenLaunchpad.CreateParams({
-      salt: keccak256("test-salt-refund"),
-      name: "Refund Token",
-      symbol: "REFUND",
-      metadata: "ipfs://refund"
+      salt: keccak256("test-salt-refund"), name: "Refund Token", symbol: "REFUND", metadata: "ipfs://refund"
     });
 
     uint256 initialBalance = fundingToken.balanceOf(user1);
@@ -449,10 +431,7 @@ contract TokenLaunchpadTest is Test {
   function test_erc721_functionality() public {
     // Create a token to get an NFT
     ITokenLaunchpad.CreateParams memory params = ITokenLaunchpad.CreateParams({
-      salt: keccak256("test-salt-nft"),
-      name: "NFT Token",
-      symbol: "NFT",
-      metadata: "ipfs://nft"
+      salt: keccak256("test-salt-nft"), name: "NFT Token", symbol: "NFT", metadata: "ipfs://nft"
     });
 
     // Approve funding token for bootstrap amount
@@ -491,10 +470,7 @@ contract TokenLaunchpadTest is Test {
 
   function test_tokenLaunched_event() public {
     ITokenLaunchpad.CreateParams memory params = ITokenLaunchpad.CreateParams({
-      salt: keccak256("test-salt-event"),
-      name: "Event Token",
-      symbol: "EVENT",
-      metadata: "ipfs://event"
+      salt: keccak256("test-salt-event"), name: "Event Token", symbol: "EVENT", metadata: "ipfs://event"
     });
 
     // Note: Event expectation removed due to struct comparison issues
