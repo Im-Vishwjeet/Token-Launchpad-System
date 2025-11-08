@@ -2,8 +2,6 @@
 
 A decentralized token launchpad system built on Ethereum and compatible chains, enabling users to create and launch new tokens with automated liquidity provision using concentrated liquidity market makers (CLMM).
 
-**Website:** [https://something.fun](https://something.fun)
-
 ## Overview
 
 The Token Launchpad System is a comprehensive smart contract framework that allows users to:
@@ -339,12 +337,6 @@ Additional networks can be added in `hardhat.config.ts` and `foundry.toml`.
 ## License
 
 This project is licensed under AGPL-3.0-or-later - see the [LICENSE](LICENSE) file for details.
-
-## Resources
-
-- **Website**: [https://something.fun](https://something.fun)
-- **Documentation**: See contract NatSpec comments for detailed function documentation
-- **Interfaces**: Check `contracts/interfaces/` for contract interfaces
 
 ## Support
 
